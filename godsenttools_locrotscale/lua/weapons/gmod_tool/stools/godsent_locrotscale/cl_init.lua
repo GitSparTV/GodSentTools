@@ -90,8 +90,6 @@ function TOOL.BuildCPanel(form)
 	general:CheckBox("#tool.godsent_locrotscale.rotationpyrtoggle", "godsent_locrotscale_rotationpyr")
 end
 
-local LaserConvar = GetConVar("godsent_locrotscale_laserpointer")
-
 do
 	local MOUSE_FIRST, IN_ATTACK, inputIsMouseDown = MOUSE_FIRST, IN_ATTACK, input.IsMouseDown
 
@@ -102,7 +100,6 @@ do
 		local E = self.TargetEntity
 		self.LastHitPos = t.HitPos
 		self.VM = ply:GetViewModel()
-		self.DrawLaser = LaserConvar:GetBool()
 
 		if op == 0 then
 			if self.Pressed then
@@ -1003,7 +1000,7 @@ do
 				surfaceDrawTexturedRect(10, 10, 64, 64)
 				surface.SetTextColor(255, 255, 255)
 				surface.SetFont("DermaLarge")
-				local t = "This is a Beta version of LocRotScale. All issues should be reported to Spar#6665."
+				local t = "This is a Beta version of LocRotScale. Report issues to Spar#6665."
 				local len, th = surface.GetTextSize(t)
 				surface.SetTextPos(w * 2 - (SysTime() * 100) % (w * 2 + len), h - th - 10)
 				surface.DrawText(t)
