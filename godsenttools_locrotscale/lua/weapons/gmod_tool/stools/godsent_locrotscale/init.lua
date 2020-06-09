@@ -123,13 +123,7 @@ do
 
 			-- p:SetPos(temp)
 			if not self.TargetBoneMode then
-				local p = E:GetPhysicsObject()
-				p:EnableMotion(true)
-				p:Wake()
 				self.TargetEntity:ManipulateBoneAngles(self.TargetBone, ang)
-				p:EnableMotion(false)
-				p:Wake()
-
 			else
 				local p = self.TargetPhys
 				p:EnableMotion(true)
