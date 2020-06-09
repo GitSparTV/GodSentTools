@@ -10,7 +10,7 @@ do
 end
 
 hook.Add("PopulateToolMenu", "GodSentToolsSecondChance", function()
-	spawnmenu.AddToolMenuOption("Utilities", "GodSent Tools", "GotSent_Second_Chance", "#godsenttools.secondchance.name", "", "", function(form)
+	spawnmenu.AddToolMenuOption("Utilities", "GodSent Tools", "GodSent_Second_Chance", "#godsenttools.secondchance.name", "", "", function(form)
 		form:SetName("#godsenttools.secondchance.name")
 		form:Help("#godsenttools.secondchance.description")
 		form:CheckBox("#godsenttools.enable", "godsent_second_chance")

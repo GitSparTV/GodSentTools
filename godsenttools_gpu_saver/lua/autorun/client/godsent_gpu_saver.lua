@@ -24,7 +24,7 @@ hook.Add("PopulateToolMenu", "GodSentToolsGPUSaver", function()
 		KeyboardController:SetMouseInputEnabled(false)
 	end
 
-	spawnmenu.AddToolMenuOption("Utilities", "GodSent Tools", "GotSent_GPU_Saver", "#godsenttools.gpusaver.name", "", "", function(form)
+	spawnmenu.AddToolMenuOption("Utilities", "GodSent Tools", "GodSent_GPU_Saver", "#godsenttools.gpusaver.name", "", "", function(form)
 		form:SetName("#godsenttools.gpusaver.name")
 		form:Help("#godsenttools.gpusaver.description")
 
