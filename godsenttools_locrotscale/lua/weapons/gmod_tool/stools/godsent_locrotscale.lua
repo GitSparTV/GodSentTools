@@ -209,11 +209,11 @@ do
 		if SERVER then
 			if self.TargetBoneMode then
 				self.RotationOriginal = self.TargetPhys:GetAngles()
+				self:CachePhys(self.TargetEntity)
 			else
 				self.RotationOriginal = self.TargetEntity:GetManipulateBoneAngles(self.TargetBone)
 			end
 
-			self:CachePhys(self.TargetEntity)
 		end
 
 		self.RotationDirAng = ma
