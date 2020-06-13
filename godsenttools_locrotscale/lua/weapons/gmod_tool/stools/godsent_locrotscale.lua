@@ -198,11 +198,14 @@ do
 			else
 				self.RotationOriginal = self.TargetEntity:GetManipulateBoneAngles(self.TargetBone)
 			end
-
 		end
 
 		self.RotationDirAng = ma
-		if not ma then error("[2] Report Spar") end
+
+		if not ma then
+			error("[2] Report Spar")
+		end
+
 		self.RotationStartAng = OFA
 		self.RotationStartDeg = deg
 		self.RotationStartSnapOffset = mathfmod(deg, 5)

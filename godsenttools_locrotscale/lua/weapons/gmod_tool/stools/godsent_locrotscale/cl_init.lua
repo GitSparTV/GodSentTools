@@ -1,21 +1,22 @@
 do
-	language.Add("tool.godsent_locrotscale.name", "LocRotScale")
-	language.Add("tool.godsent_locrotscale.desc", "LocRotScale")
-	language.Add("tool.godsent_locrotscale.propkeylabel", "Properties tab toggle hotkey")
-	language.Add("tool.godsent_locrotscale.propkeytoggle", "Toggle properties menu")
-	language.Add("tool.godsent_locrotscale.rotationpyrtoggle", "Show PYR rotation")
-	language.Add("tool.godsent_locrotscale.prop.name", "Properties Tab Settings")
-	language.Add("tool.godsent_locrotscale.selectionmenu.title", "LocRotScale Bone Selection")
-	language.Add("tool.godsent_locrotscale.selectionmenu.id", "ID")
-	language.Add("tool.godsent_locrotscale.selectionmenu.name", "Name")
-	language.Add("tool.godsent_locrotscale.selectionmenu.distance", "Distance")
-	language.Add("tool.godsent_locrotscale.selectionmenu.isvisible", "Is Visible")
-	language.Add("tool.godsent_locrotscale.selectionmenu.parent", "Parent")
-	language.Add("tool.godsent_locrotscale.selectionmenu.list", "List")
-	language.Add("tool.godsent_locrotscale.selectionmenu.tree", "Hierarchy")
-	language.Add("tool.godsent_locrotscale.selectionmenu.show", "Show")
-	language.Add("tool.godsent_locrotscale.selectionmenu.use", "Select")
-	language.Add("tool.godsent_locrotscale.selectionmenu.copy", "Copy name")
+	local languageAdd = language.Add
+	languageAdd("tool.godsent_locrotscale.name", "LocRotScale")
+	languageAdd("tool.godsent_locrotscale.desc", "LocRotScale")
+	languageAdd("tool.godsent_locrotscale.propkeylabel", "Properties tab toggle hotkey")
+	languageAdd("tool.godsent_locrotscale.propkeytoggle", "Toggle properties menu")
+	languageAdd("tool.godsent_locrotscale.rotationpyrtoggle", "Show PYR rotation")
+	languageAdd("tool.godsent_locrotscale.prop.name", "Properties Tab Settings")
+	languageAdd("tool.godsent_locrotscale.selectionmenu.title", "LocRotScale Bone Selection")
+	languageAdd("tool.godsent_locrotscale.selectionmenu.id", "ID")
+	languageAdd("tool.godsent_locrotscale.selectionmenu.name", "Name")
+	languageAdd("tool.godsent_locrotscale.selectionmenu.distance", "Distance")
+	languageAdd("tool.godsent_locrotscale.selectionmenu.isvisible", "Is Visible")
+	languageAdd("tool.godsent_locrotscale.selectionmenu.parent", "Parent")
+	languageAdd("tool.godsent_locrotscale.selectionmenu.list", "List")
+	languageAdd("tool.godsent_locrotscale.selectionmenu.tree", "Hierarchy")
+	languageAdd("tool.godsent_locrotscale.selectionmenu.show", "Show")
+	languageAdd("tool.godsent_locrotscale.selectionmenu.use", "Select")
+	languageAdd("tool.godsent_locrotscale.selectionmenu.copy", "Copy name")
 end
 
 local ceiloor = TOOL.ceiloor
@@ -23,6 +24,8 @@ local ceiloor = TOOL.ceiloor
 local function Round(n, decimals)
 	return ceiloor(n / decimals) * decimals
 end
+
+local icons = { Material("godsenttools/rotlocscale/select_7.png", "alphatest mips ignorez"), Material("godsenttools/rotlocscale/move_9.png", "alphatest mips ignorez"), Material("godsenttools/rotlocscale/rotate_4.png", "alphatest mips ignorez"), (Material("godsenttools/rotlocscale/scale_3.png", "alphatest mips ignorez")) }
 
 local R, G, B, Y, Hover = Color(255, 0, 0, 150), Color(0, 255, 0, 150), Color(0, 0, 255, 150), Color(255, 200, 0, 150), Color(255, 255, 0)
 local NumToColor
@@ -37,25 +40,29 @@ G, B, Y
 end
 
 do
-	local netReadEntity, netReadDouble, netReadUInt, netReadNormal, netReadAngle = net.ReadEntity, net.ReadDouble, net.ReadUInt, net.ReadNormal, net.ReadAngle
+	local netReadEntity, netReadAngle, netReadBool, netReadVector, LocalPlayer, netReadDouble, netReadUInt, netReadNormal, bitband = net.ReadEntity, net.ReadAngle, net.ReadBool, net.ReadVector, LocalPlayer, net.ReadDouble, net.ReadUInt, net.ReadNormal, bit.band
 
 	net.Receive("GodSentToolsLocRotScale", function()
-		local swep = netReadEntity()
-		if not swep:IsValid() then return end
-		local tool = swep:GetToolObject()
-		if not tool then return end
+		local tool
+
+		do
+			local swep = netReadEntity()
+			if not swep:IsValid() then return end
+			tool = swep:GetToolObject()
+			if not tool then return end
+		end
+
 		local event = netReadUInt(3)
 
 		if event == 4 then
 			local flag = netReadUInt(2)
-			print("Update", flag)
 
-			if bit.band(flag, 1) == 1 then
-				tool.BonePos = net.ReadVector()
+			if bitband(flag, 1) == 1 then
+				tool.BonePos = netReadVector()
 			end
 
-			if bit.band(flag, 2) == 2 then
-				tool.BoneAng = net.ReadAngle()
+			if bitband(flag, 2) == 2 then
+				tool.BoneAng = netReadAngle()
 				-- tool.BoneAng = Angle(net.ReadFloat(), net.ReadFloat(), net.ReadFloat())
 			end
 		elseif event == 1 then
@@ -69,8 +76,8 @@ do
 		elseif event == 0 then
 			local ent = netReadEntity()
 			if not ent:IsValid() then return end
-			tool:SetTargetEntity(ent, net.ReadUInt(8))
-			tool.TargetBoneMode = net.ReadBool()
+			tool:SetTargetEntity(ent, netReadUInt(8))
+			tool.TargetBoneMode = netReadBool()
 		elseif event == 2 then
 			tool:CancelAction(tool:GetOperation())
 		end
@@ -154,7 +161,7 @@ do
 			if op == 2 then
 				if self.Pressed then
 					-- ply:DrawViewModel(false)
-					if not ply:KeyDown(IN_ATTACK) and not inputIsMouseDown(MOUSE_FIRST) then
+					if LeftClick then
 						self:RotateEnd()
 
 						return
@@ -163,6 +170,92 @@ do
 
 				self:RotationThink(t)
 			end
+			self:ModeSelectorThink(ply, LeftClick)
+		end
+
+	end
+end
+
+do
+	do
+		local netWriteUInt, ScrW, ScrH, inputGetCursorPos, netSendToServer, mathabs, mathatan2, netStart, guiEnableScreenClicker, IN_ATTACK2 = net.WriteUInt, ScrW, ScrH, input.GetCursorPos, net.SendToServer, math.abs, math.atan2, net.Start, gui.EnableScreenClicker, IN_ATTACK2
+
+		function TOOL:ModeSelectorThink(ply, LeftClick)
+			if not self.Pressed and ply:KeyDown(IN_ATTACK2) and LeftClick then
+				self.RightPressed = true
+				guiEnableScreenClicker(true)
+				local deg
+
+				do
+					local X, Y = inputGetCursorPos()
+					local DX, DY = ScrW() * 0.5 - X, ScrH() * 0.5 - Y
+
+					if mathabs(DX) < 24 and mathabs(DY) < 24 then
+						self.ModeSelectorHovered = nil
+
+						return
+					end
+
+					deg = mathatan2(DX, DY)
+				end
+
+				-- if deg <= 1.0471975511966 and deg > -1.0471975511966 then
+				-- self.ModeSelectorHovered = 2
+				-- elseif deg > 1.0471975511966 and deg < 3.1415926535898 then
+				-- self.ModeSelectorHovered = 4
+				-- else
+				self.ModeSelectorHovered = 3
+				-- end
+			elseif self.RightPressed then
+				do
+					local H = self.ModeSelectorHovered
+
+					if H then
+						netStart("GodSentToolsLocRotScale")
+						netWriteUInt(1, 1)
+						netWriteUInt(H - 2, 2)
+						netSendToServer()
+						self:SetOperation(H - 1)
+					end
+				end
+
+				self.RightPressed = false
+				guiEnableScreenClicker(false)
+			end
+		end
+	end
+
+	do
+		local iconsOffsets = { nil, -32, -64 - 32 - 16, 37, 8, -(64 + 37), 8 }
+
+		local surfaceDrawTexturedRect, drawRoundedBox, Color1, ScrW, surfaceSetMaterial, Color2, Color3, surfaceSetDrawColor, ScrH, renderPopFilterMag, renderPushFilterMag, renderPopFilterMin, renderPushFilterMin = surface.DrawTexturedRect, draw.RoundedBox, Color(75, 75, 75), ScrW, surface.SetMaterial, Color(50, 50, 50), Color(0, 0, 0, 100), surface.SetDrawColor, ScrH, render.PopFilterMag, render.PushFilterMag, render.PopFilterMin, render.PushFilterMin
+
+		function TOOL:DrawModeSelector()
+			local CW, CH = ScrW() * 0.5, ScrH() * 0.5
+			drawRoundedBox(136, CW - 136, CH - 136, 272, 272, Color2)
+			drawRoundedBox(24, CW - 24, CH - 24, 48, 48, Color1)
+			surfaceSetDrawColor(255, 255, 255)
+			renderPushFilterMag(3)
+			renderPushFilterMin(3)
+			local icons = icons
+
+			for k = 2, 4 do
+				if self.ModeSelectorHovered == k then
+					drawRoundedBox(10, CW + iconsOffsets[(k - 1) * 2] - 8, CH + iconsOffsets[(k - 1) * 2 + 1] - 8, 64 + 16, 64 + 16, Color1)
+					surfaceSetDrawColor(255, 255, 255)
+				end
+
+				surfaceSetMaterial(icons[k])
+				surfaceDrawTexturedRect(CW + iconsOffsets[(k - 1) * 2], CH + iconsOffsets[(k - 1) * 2 + 1], 64, 64)
+
+				if k == 2 or k == 4 then
+					drawRoundedBox(10, CW + iconsOffsets[(k - 1) * 2] - 8, CH + iconsOffsets[(k - 1) * 2 + 1] - 8, 64 + 16, 64 + 16, Color3)
+					surfaceSetDrawColor(255, 255, 255)
+				end
+			end
+
+			renderPopFilterMag(3)
+			renderPopFilterMin(3)
 		end
 	end
 end
@@ -200,10 +293,10 @@ do
 
 				local PivotMax = PivotMax
 				PivotMax:SetUnpacked(size, size, size)
-				render.DrawBox(P, A, PivotMin, PivotMax, color_black)
+				renderDrawBox(P, A, PivotMin, PivotMax, color_black)
 				PivotMin:Mul(0.7)
 				PivotMax:Mul(0.7)
-				render.DrawBox(P, A, PivotMin, PivotMax, Y)
+				renderDrawBox(P, A, PivotMin, PivotMax, Y)
 			end
 
 			size = size * (0.02 / 0.03)
@@ -212,8 +305,8 @@ do
 				self:DrawRotation3D(P, size)
 			end
 
-			cam.IgnoreZ(false)
-			cam.End()
+			-- cam.IgnoreZ(false)
+			camEnd()
 
 			if op == 2 then
 				self:DrawRotation2D(P, size)
@@ -387,18 +480,22 @@ do
 			do
 				local len, h = HovBoneNameLen, HovBoneNameH
 				y = y - h - 16
-				surface.DrawRect(x + 4, y, len + 4, h + 4)
-				surface.SetTextPos(x + 6, y + 2)
+				surfaceDrawRect(x + 4, y, len + 4, h + 4)
+				surfaceSetTextPos(x + 6, y + 2)
 			end
 
-			surface.DrawText(HovBoneName)
+			surfaceDrawText(HovBoneName)
 		end
 	end
 
 	do
+		local t3D = {
+			type = "3D"
+		}
+
 		local Frame
 		local ParentColor, ChildColor, BoneColor, R = Color(150, 150, 150, 200), Color(255, 255, 255, 200), Color(200, 200, 200), Color(255, 0, 0)
-
+		local renderDrawBeam, renderDrawSphere, renderSetColorMaterialIgnoreZ, SysTime, camEnd3D, camStart3D = render.DrawBeam, render.DrawSphere, render.SetColorMaterialIgnoreZ, SysTime, cam.End3D, cam.Start3D
 		function TOOL:SelectionShowBone(E, bonen)
 			local children = E:GetChildBones(bonen)
 			local parent = E:GetBoneParent(bonen)
@@ -418,7 +515,7 @@ do
 				local clock = SysTime() - start
 
 				if clock % 0.7 >= 0.35 then
-					cam.Start3D()
+					camStart3D(t3D)
 					local epos = E:GetPos()
 					local HovBonePos = E:GetBonePosition(bonen)
 
@@ -428,9 +525,10 @@ do
 
 					local scale = epos - EyePos()
 					scale = scale:Length() * (0.3 * 0.02)
-					render.SetColorMaterialIgnoreZ()
+					renderSetColorMaterialIgnoreZ()
 
 					do
+						local ChildColor = ChildColor
 						for k, v in ipairs(children) do
 							local pos = E:GetBonePosition(v)
 
@@ -438,11 +536,12 @@ do
 								pos = E:GetBoneMatrix(v):GetTranslation()
 							end
 
-							render.DrawBeam(HovBonePos, pos, scale, 0, 1, ChildColor)
+							renderDrawBeam(HovBonePos, pos, scale, 0, 1, ChildColor)
 						end
 					end
 
 					do
+						local ParentColor = ParentColor
 						if parent ~= -1 then
 							local pos = E:GetBonePosition(parent)
 
@@ -450,12 +549,12 @@ do
 								pos = E:GetBoneMatrix(parent):GetTranslation()
 							end
 
-							render.DrawBeam(HovBonePos, pos, scale, 0, 1, ParentColor)
+							renderDrawBeam(HovBonePos, pos, scale, 0, 1, ParentColor)
 						end
 					end
 
-					render.DrawSphere(HovBonePos, scale, 5, 5, R)
-					cam.End3D()
+					renderDrawSphere(HovBonePos, scale, 5, 5, R)
+					camEnd3D()
 				end
 
 				if clock > 4 then
@@ -468,13 +567,16 @@ do
 			end)
 		end
 
-		function TOOL:SelectionSetBone(E, bonen)
-			net.Start("GodSentToolsLocRotScale")
-			net.WriteUInt(0, 1)
-			net.WriteEntity(E)
-			net.WriteUInt(bonen, 8)
-			net.SendToServer()
-		end
+do
+			local netWriteUInt, netWriteEntity, netStart, netSendToServer = net.WriteUInt, net.WriteEntity, net.Start, net.SendToServer
+			function TOOL:SelectionSetBone(E, bonen)
+				netStart("GodSentToolsLocRotScale")
+				netWriteUInt(0, 1)
+				netWriteEntity(E)
+				netWriteUInt(bonen, 8)
+				netSendToServer()
+			end
+end
 
 		function TOOL:SelectionMenu(E, t)
 			if not E or not E:IsValid() then return end
@@ -649,7 +751,7 @@ do
 	local GetPlaneNormal = TOOL.GetPlaneNormal
 	local ToDegVector = Vector()
 	local RotationDegText, RotationDegTextLen, RotationDegTextH
-
+	local IN_SPEED, surfaceGetTextSize, surfaceSetFont, LocalPlayer, mathNormalizeAngle = IN_SPEED, surface.GetTextSize, surface.SetFont, LocalPlayer, math.NormalizeAngle
 	function TOOL:RotationThink(t)
 		local E, bone = self.TargetEntity, self.TargetBone
 		local P, A = self.BonePos, self.BoneAng
@@ -822,16 +924,16 @@ do
 							local e = ToDegVector:Angle()[2]
 
 							if LocalPlayer():KeyDown(IN_SPEED) then
-								d = math.NormalizeAngle(ceiloor((e - self.RotationStartDeg) * 0.2) * 5)
+								d = mathNormalizeAngle(ceiloor((e - self.RotationStartDeg) * 0.2) * 5)
 							else
-								d = math.NormalizeAngle(e - self.RotationStartDeg)
+								d = mathNormalizeAngle(e - self.RotationStartDeg)
 							end
 						end
 
 						local text = Round(d, 0.1) .. "°"
 						RotationDegText = text
-						surface.SetFont("Trebuchet18")
-						RotationDegTextLen, RotationDegTextH = surface.GetTextSize(text)
+						surfaceSetFont("Trebuchet18")
+						RotationDegTextLen, RotationDegTextH = surfaceGetTextSize(text)
 					end
 				end
 			end
@@ -878,6 +980,8 @@ do
 		end
 	end
 
+	local renderAddBeam, renderDrawBeam, renderStartBeam, renderEndBeam = render.AddBeam, render.DrawBeam, render.StartBeam, render.EndBeam
+
 	function TOOL:DrawRotation3D(P, size)
 		do
 			local RotationDisks = RotationDisks
@@ -888,7 +992,7 @@ do
 				local HoverDisk = self.RotationHoverDisk
 
 				do
-					render.StartBeam(diskpart)
+					renderStartBeam(diskpart)
 					local R = R
 
 					if HoverDisk == 0 then
@@ -896,15 +1000,15 @@ do
 					end
 
 					for i = 0, RotationDisksLen, 8 do
-						render.AddBeam(RotationDisks[i], size, 1, R)
-						render.AddBeam(RotationDisks[i + 1], size, 1, R)
+						renderAddBeam(RotationDisks[i], size, 1, R)
+						renderAddBeam(RotationDisks[i + 1], size, 1, R)
 					end
 
-					render.EndBeam()
+					renderEndBeam()
 				end
 
 				do
-					render.StartBeam(diskpart)
+					renderStartBeam(diskpart)
 					local G = G
 
 					if HoverDisk == 1 then
@@ -912,15 +1016,15 @@ do
 					end
 
 					for i = 0, RotationDisksLen, 8 do
-						render.AddBeam(RotationDisks[i + 2], size, 1, G)
-						render.AddBeam(RotationDisks[i + 3], size, 1, G)
+						renderAddBeam(RotationDisks[i + 2], size, 1, G)
+						renderAddBeam(RotationDisks[i + 3], size, 1, G)
 					end
 
-					render.EndBeam()
+					renderEndBeam()
 				end
 
 				do
-					render.StartBeam(diskpart)
+					renderStartBeam(diskpart)
 					local B = B
 
 					if HoverDisk == 2 then
@@ -928,15 +1032,15 @@ do
 					end
 
 					for i = 0, RotationDisksLen, 8 do
-						render.AddBeam(RotationDisks[i + 4], size, 1, B)
-						render.AddBeam(RotationDisks[i + 5], size, 1, B)
+						renderAddBeam(RotationDisks[i + 4], size, 1, B)
+						renderAddBeam(RotationDisks[i + 5], size, 1, B)
 					end
 
-					render.EndBeam()
+					renderEndBeam()
 				end
 
 				do
-					render.StartBeam(diskpart)
+					renderStartBeam(diskpart)
 					local Y = Y
 
 					if HoverDisk == 3 then
@@ -944,35 +1048,42 @@ do
 					end
 
 					for i = 0, RotationDisksLen, 8 do
-						render.AddBeam(RotationDisks[i + 6], size, 1, Y)
-						render.AddBeam(RotationDisks[i + 7], size, 1, Y)
+						renderAddBeam(RotationDisks[i + 6], size, 1, Y)
+						renderAddBeam(RotationDisks[i + 7], size, 1, Y)
 					end
 
-					render.EndBeam()
+					renderEndBeam()
 				end
 			else
 				do
-					render.StartBeam(RotationDisksLen)
-					local C = NumToColor[self.RotationDirColor]
+					renderStartBeam(RotationDisksLen)
+					local dircolor = self.RotationDirColor
+					local C = NumToColor[dircolor]
 
 					for i = 0, RotationDisksLen, 2 do
-						render.AddBeam(RotationDisks[i], size, 1, C)
-						render.AddBeam(RotationDisks[i + 1], size, 1, C)
+						renderAddBeam(RotationDisks[i], size, 1, C)
+						renderAddBeam(RotationDisks[i + 1], size, 1, C)
 					end
 
-					render.EndBeam()
+					renderEndBeam()
 
 					do
 						local r = self.EntityDistanceLen
 
-						if self.RotationDirColor == 3 then
+						if dircolor == 3 then
 							r = r * 1.2
 						end
 
-						render.DrawBeam(P, P + self.RotationStart * r, size, 0, 1, Y)
+						do
+							local dir = self.RotationStart * r
+							dir:Add(P)
+							renderDrawBeam(P, dir, size, 0, 1, Y)
+						end
 
 						if self.RotationCurrent then
-							render.DrawBeam(P, P + self.RotationCurrent * r, size, 0, 1, Hover)
+							local dir = self.RotationCurrent * r
+							dir:Add(P)
+							renderDrawBeam(P, dir, size, 0, 1, Hover)
 						end
 					end
 				end
@@ -980,30 +1091,34 @@ do
 		end
 	end
 
-	function TOOL:DrawRotation2D(P, size)
-		if not self.Pressed or not self.RotationHit then return end
-		surface.SetDrawColor(50, 50, 50, 200)
+	do
+		local surfaceSetTextColor, surfaceDrawRect, surfaceSetTextPos, surfaceSetFont, surfaceSetDrawColor, surfaceDrawText = surface.SetTextColor, surface.DrawRect, surface.SetTextPos, surface.SetFont, surface.SetDrawColor, surface.DrawText
 
-		do
-			local x, y
+		function TOOL:DrawRotation2D(P, size)
+			if not self.Pressed or not self.RotationHit then return end
+			surfaceSetDrawColor(50, 50, 50, 200)
 
 			do
-				local V = self.RotationCurrent * self.EntityDistanceLen
-				V:Mul(0.5)
-				V:Add(P)
-				local v = V:ToScreen()
-				x, y = v.x, v.y
+				local x, y
+
+				do
+					local V = self.RotationCurrent * self.EntityDistanceLen
+					V:Mul(0.5)
+					V:Add(P)
+					local v = V:ToScreen()
+					x, y = v.x, v.y
+				end
+
+				local len, h = RotationDegTextLen, RotationDegTextH
+				x, y = x - len * 0.5, y - h * 0.5
+				surfaceDrawRect(x - 2, y - 2, len + 4, h + 4)
+				surfaceSetTextPos(x, y)
 			end
 
-			local len, h = RotationDegTextLen, RotationDegTextH
-			x, y = x - len * 0.5, y - h * 0.5
-			surface.DrawRect(x - 2, y - 2, len + 4, h + 4)
-			surface.SetTextPos(x, y)
+			surfaceSetTextColor(255, 255, 255)
+			surfaceSetFont("Trebuchet18")
+			surfaceDrawText(RotationDegText)
 		end
-
-		surface.SetTextColor(255, 255, 255)
-		surface.SetFont("Trebuchet18")
-		surface.DrawText(RotationDegText)
 	end
 end
 
@@ -1273,12 +1388,12 @@ do
 					surfaceSetTextColor(255, 255, 255)
 					local factor = mathfloor(ScrH() * (1 / 480))
 					local w, h = 180 * factor, 12 * Sh * factor
-					local s
+					local ST, s = SysTime()
 
 					if animstate then
-						s = oQuerp(SysTime() - lastTime, 1, position or 4, w)
+						s = oQuerp(ST - lastTime, 1, position or 4, w)
 					else
-						s = oQuerp(SysTime() - lastTime, 1, position or w, 4)
+						s = oQuerp(ST - lastTime, 1, position or w, 4)
 					end
 
 					do
@@ -1287,7 +1402,7 @@ do
 						drawRoundedBoxEx(10, SW, 160, w, h, Color2, true, false, true, false)
 						drawRoundedBoxEx(10, SW + 2, 162, w, h - 4, Color1, true, false, true, false)
 						surfaceSetAlphaMultiplier(1)
-						if not animstate and SysTime() - lastTime > 1 then return end
+						if not animstate and ST - lastTime > 1 then return end
 						m:Identity()
 
 						do
@@ -1369,7 +1484,7 @@ do
 					-- 	if not keystate then
 					-- 		keystate = true
 					-- 		animstate = not animstate
-					-- 		lastTime = SysTime()
+					-- 		lastTime = ST
 					-- 		position = s
 					-- 	end
 					-- elseif not keylock then
