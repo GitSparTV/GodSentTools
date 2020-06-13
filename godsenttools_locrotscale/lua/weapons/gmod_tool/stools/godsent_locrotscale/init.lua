@@ -26,6 +26,7 @@ local function BoneToPhysBone(ent, bone)
 
 	return nil
 end
+TOOL.BoneToPhysBone = BoneToPhysBone
 
 local function SetBoneOffsets(ent,ostable,sbone)
 	local RTable = {}
@@ -84,6 +85,7 @@ local function SetOffsets(tool,ent,ostable,physbone, physpos, physang)
 		end
 	end
 end
+TOOL.SetOffsets = SetOffsets
 
 do
 	local ToDegVector, DegToAngle = Vector(), Angle()

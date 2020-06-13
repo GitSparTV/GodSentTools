@@ -118,10 +118,13 @@ do
 		self.BonePos, self.BoneAng = Vector(), Angle()
 
 		if SERVER then
-			local phys = ent:TranslateBoneToPhysBone(bonen)
+			local phys = self.BoneToPhysBone(ent,bonen)
 
-			if ent:TranslatePhysBoneToBone(phys) ~= bonen then
-				phys = -2
+			-- if ent:TranslatePhysBoneToBone(phys) ~= bonen then
+			-- 	phys = -2
+			-- end
+			if ent:GetPhysicsObjectCount() == 1 then
+				phys = 0
 			end
 
 			if not phys or phys == -1 then
@@ -160,14 +163,18 @@ do
 end
 
 do
-	local SERVER, netWriteEntity, netSend, netWriteUInt, netStart, gameSinglePlayer = SERVER, net.WriteEntity, net.Send, net.netWriteUInt, net.Start, game.SinglePlayer
+	local SERVER, netWriteEntity, netSend, netWriteUInt, netStart, gameSinglePlayer = SERVER, net.WriteEntity, net.Send, net.WriteUInt, net.Start, game.SinglePlayer
 
 	function TOOL:CancelAction(op)
 		self.Pressed = false
 
 		if op == 2 then
 			if SERVER then
-				self.TargetEntity:ManipulateBoneAngles(self.TargetBone, self.RotationOriginal)
+				if self.TargetBoneMode then
+					self:SetOffsets(self.TargetEntity, self.PhysBoneOffsetsKeys, self.TargetPhysBone, self.TargetPhys:GetPos(), self.RotationOriginal)
+				else
+					self.TargetEntity:ManipulateBoneAngles(self.TargetBone, self.RotationOriginal)
+				end
 			end
 
 			self:RotateEnd()
