@@ -59,7 +59,7 @@ TOOL.ceiloor = ceiloor
 
 do
 	function TOOL:LeftClick(tr)
-		local op = self:GetOperation()
+		local op = self:GetOwner():KeyDown(IN_SPEED) and 0 or self:GetOperation()
 
 		if op == 0 and tr.Entity then
 			return self:SelectTry(tr.Entity, tr)
@@ -71,30 +71,15 @@ do
 	end
 end
 
-do
-	local IsValid = IsValid
-
-	function TOOL:RightClick(tr)
-		if IsValid(self.TargetEntity) then
-			local op = self:GetOperation()
-
-			if not self.Pressed then
-				self:SetOperation((op + 1) % 3)
-
-				return
-			end
-
-			self:CancelAction(op)
-		else
-			self:SetOperation(0)
-		end
-
-		return false
+function TOOL:RightClick()
+	if self.Pressed then
+		local op = self:GetOperation()
+		self:CancelAction(op)
 	end
 end
 
 function TOOL:Reload(t)
-	local op = self:GetOperation()
+	local op = self:GetOwner():KeyDown(IN_SPEED) and 0 or self:GetOperation()
 
 	if op == 0 then
 		if CLIENT then

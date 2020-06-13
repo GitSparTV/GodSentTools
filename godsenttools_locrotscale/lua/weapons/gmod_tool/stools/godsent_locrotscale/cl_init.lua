@@ -90,16 +90,21 @@ function TOOL.BuildCPanel(form)
 	general:CheckBox("#tool.godsent_locrotscale.rotationpyrtoggle", "godsent_locrotscale_rotationpyr")
 end
 
+function TOOL:Holster()
+	if self.RightPressed then
+		gui.EnableScreenClicker(false)
+	end
+end
+
 do
-	local MOUSE_FIRST, IN_ATTACK, inputIsMouseDown = MOUSE_FIRST, IN_ATTACK, input.IsMouseDown
+	local MOUSE_LEFT, IN_SPEED, inputIsMouseDown, IN_ATTACK = MOUSE_LEFT, IN_SPEED, input.IsMouseDown, IN_ATTACK
 
 	function TOOL:Think()
-		local op = self:GetOperation()
-		local ply = self:GetOwner()
-		local t = ply:GetEyeTrace()
+		local op = self.SelectionMode and 0 or self:GetOperation()
 		local E = self.TargetEntity
-		self.LastHitPos = t.HitPos
-		self.VM = ply:GetViewModel()
+		local ply = self:GetOwner()
+		self.SelectionMode = not self.Pressed and ply:KeyDown(IN_SPEED)
+		local LeftClick = not ply:KeyDown(IN_ATTACK) and not inputIsMouseDown(MOUSE_LEFT)
 
 		if op == 0 then
 			if self.Pressed then
@@ -107,7 +112,7 @@ do
 				self.Pressed, self.TargetEntity = nil, nil
 			end
 
-			self:SelectionThink(self:GetOwner():GetEyeTrace())
+			self:SelectionThink(ply:GetEyeTrace())
 		end
 
 		if E and E:IsValid() then
@@ -136,6 +141,7 @@ do
 
 			local S = E:GetManipulateBoneScale(bone)
 			self.BoneScale = S
+			local t = ply:GetEyeTrace()
 
 			do
 				local size = P - t.StartPos
@@ -168,19 +174,20 @@ do
 
 	local PivotMin, PivotMax = Vector(), Vector()
 	local Y = Color(255, 200, 0)
-	local LocalPlayer, color_white = LocalPlayer, color_white
+	local color_black = color_black
+	local camEnd, renderSetColorMaterialIgnoreZ, camStart, renderDrawBox = cam.End, render.SetColorMaterialIgnoreZ, cam.Start, render.DrawBox
 
 	function TOOL:DrawHUD()
 		local E = self.TargetEntity
-		local op = self:GetOperation()
+		local op = self.SelectionMode and 0 or self:GetOperation()
 
 		if E and E:IsValid() then
-			-- render.SetColorMaterialIgnoreZ()
 			local P, A = self.BonePos, self.BoneAng
 			local s = self.EntityDistanceLen
-			cam.Start(t3D)
-			cam.IgnoreZ(true)
-			render.SetColorMaterial()
+			camStart(t3D)
+			-- cam.IgnoreZ(true)
+			renderSetColorMaterialIgnoreZ()
+			-- render.SetColorMaterial()
 			local size = s * 0.03
 
 			do
@@ -216,12 +223,13 @@ do
 		end
 
 		if op == 0 then
-			cam.Start(t3D)
-			cam.IgnoreZ(true)
-			render.SetColorMaterial()
+			camStart(t3D)
+			-- cam.IgnoreZ(true)
+			-- render.SetColorMaterial()
+			renderSetColorMaterialIgnoreZ()
 			local draw2d = self:DrawSelection3D()
-			cam.IgnoreZ(false)
-			cam.End()
+			-- cam.IgnoreZ(false)
+			camEnd()
 
 			if draw2d then
 				self:DrawSelection2D()
@@ -229,6 +237,10 @@ do
 		end
 
 		self:DrawModeMenu()
+
+		if self.RightPressed then
+			self:DrawModeSelector()
+		end
 	end
 end
 
@@ -236,65 +248,75 @@ do
 	local HovEntBones, HovBoneChildren, HovEnt, HovBone, HovBoneParent, HovEntBoneK, HovBoneName, HovBoneNameLen, HovBoneNameH = { }, { }
 	local TempParentInfo = { }
 
-	function TOOL:SelectionThink(t)
-		local E = t.Entity
-		if not E or not E:IsValid() then HovEnt = nil return end
-		local k = E:GetBoneCount()
-		local hit = t.HitPos
-		local closest, closestbone = math.huge
-		HovEnt = E
-		HovEntBoneK = k - 1
-		local TempParentInfo = TempParentInfo
+	do
+		local surfaceGetTextSize, mathhuge, surfaceSetFont, BONE_USED_BY_VERTEX_LOD0, BONE_ALWAYS_PROCEDURAL = surface.GetTextSize, math.huge, surface.SetFont, BONE_USED_BY_VERTEX_LOD0, BONE_ALWAYS_PROCEDURAL
 
-		do
-			local HovEntBones = HovEntBones
-			local epos = E:GetPos()
+		function TOOL:SelectionThink(t)
+			local E = t.Entity
 
-			for i = 0, k - 1 do
-				local v = E:GetBonePosition(i)
+			if not E or not E:IsValid() then
+				HovEnt = nil
 
-				if not v or v == epos then
-					local m = E:GetBoneMatrix(i)
-
-					if m then
-						v = m:GetTranslation()
-					end
-				end
-
-				local dist = hit:DistToSqr(v)
-				HovEntBones[i] = v
-				TempParentInfo[i] = E:GetBoneParent(i)
-
-				if not E:BoneHasFlag(i, BONE_ALWAYS_PROCEDURAL) and closest > dist then
-					closest = dist
-					closestbone = i
-				end
+				return
 			end
-		end
 
-		HovBone = closestbone
-
-		if closestbone then
-			HovBoneName = E:GetBoneName(closestbone)
-			surface.SetFont("Trebuchet18")
-			HovBoneNameLen, HovBoneNameH = surface.GetTextSize(HovBoneName)
-			HovBoneParent = E:GetBoneParent(closestbone)
+			local k = E:GetBoneCount()
+			local hit = t.HitPos
+			local closest, closestbone = mathhuge
+			HovEnt = E
+			HovEntBoneK = k - 1
+			local TempParentInfo = TempParentInfo
 
 			do
-				local c = 1
-				local HovBoneChildren = HovBoneChildren
+				local HovEntBones = HovEntBones
+				local epos = E:GetPos()
 
-				for i = 1, k - 1 do
-					if TempParentInfo[i] == closestbone and E:BoneHasFlag(i, BONE_USED_BY_VERTEX_LOD0) and not E:BoneHasFlag(i, BONE_ALWAYS_PROCEDURAL) then
-						HovBoneChildren[c] = i
-						c = c + 1
+				for i = 0, k - 1 do
+					local v = E:GetBonePosition(i)
+
+					if not v or v == epos then
+						local m = E:GetBoneMatrix(i)
+
+						if m then
+							v = m:GetTranslation()
+						end
+					end
+
+					local dist = hit:DistToSqr(v)
+					HovEntBones[i] = v
+					TempParentInfo[i] = E:GetBoneParent(i)
+
+					if not E:BoneHasFlag(i, BONE_ALWAYS_PROCEDURAL) and closest > dist then
+						closest = dist
+						closestbone = i
 					end
 				end
+			end
 
-				if c == 1 then
-					HovBoneChildren[1] = nil
-				else
-					HovBoneChildren[c] = nil
+			HovBone = closestbone
+
+			if closestbone then
+				HovBoneName = E:GetBoneName(closestbone)
+				surfaceSetFont("Trebuchet18")
+				HovBoneNameLen, HovBoneNameH = surfaceGetTextSize(HovBoneName)
+				HovBoneParent = E:GetBoneParent(closestbone)
+
+				do
+					local c = 1
+					local HovBoneChildren = HovBoneChildren
+
+					for i = 1, k - 1 do
+						if TempParentInfo[i] == closestbone and E:BoneHasFlag(i, BONE_USED_BY_VERTEX_LOD0) and not E:BoneHasFlag(i, BONE_ALWAYS_PROCEDURAL) then
+							HovBoneChildren[c] = i
+							c = c + 1
+						end
+					end
+
+					if c == 1 then
+						HovBoneChildren[1] = nil
+					else
+						HovBoneChildren[c] = nil
+					end
 				end
 			end
 		end
@@ -302,17 +324,22 @@ do
 
 	do
 		local OutlineColor, ParentColor, ChildColor, BoneColor = Color(0, 0, 0), Color(150, 150, 150, 200), Color(255, 255, 255, 200), Color(200, 200, 200)
+		local renderDrawBeam, ipairs, BONE_ALWAYS_PROCEDURAL, renderDrawSphere, renderOverrideBlend, EyePos, BONE_USED_BY_VERTEX_LOD0 = render.DrawBeam, ipairs, BONE_ALWAYS_PROCEDURAL, render.DrawSphere, render.OverrideBlend, EyePos, BONE_USED_BY_VERTEX_LOD0
 
 		function TOOL:DrawSelection3D()
 			if not HovEnt or not HovBone then return end
+			local HovEntBones = HovEntBones
 			local HovBonePos = HovEntBones[HovBone]
 			local scale = HovBonePos - EyePos()
 			scale = scale:Length() * (0.3 * 0.02)
+			local OutlineColor = OutlineColor
 
 			do
+				local ChildColor = ChildColor
+
 				for k, v in ipairs(HovBoneChildren) do
-					render.DrawBeam(HovBonePos, HovEntBones[v], scale + 0.1, 0, 1, OutlineColor)
-					render.DrawBeam(HovBonePos, HovEntBones[v], scale, 0, 1, ChildColor)
+					renderDrawBeam(HovBonePos, HovEntBones[v], scale + 0.1, 0, 1, OutlineColor)
+					renderDrawBeam(HovBonePos, HovEntBones[v], scale, 0, 1, ChildColor)
 				end
 			end
 
@@ -320,31 +347,36 @@ do
 				local parent = HovBoneParent
 
 				if parent ~= -1 then
-					render.DrawBeam(HovBonePos, HovEntBones[parent], scale + 0.1, 0, 1, OutlineColor)
-					render.DrawBeam(HovBonePos, HovEntBones[parent], scale, 0, 1, ParentColor)
+					renderDrawBeam(HovBonePos, HovEntBones[parent], scale + 0.1, 0, 1, OutlineColor)
+					renderDrawBeam(HovBonePos, HovEntBones[parent], scale, 0, 1, ParentColor)
 				end
 			end
 
-			render.OverrideBlend(true, 1, 1, 1)
+			renderOverrideBlend(true, 1, 1, 1)
 
-			for i = 0, HovEntBoneK do
-				if HovEnt:BoneHasFlag(i, BONE_USED_BY_VERTEX_LOD0) and not HovEnt:BoneHasFlag(i, BONE_ALWAYS_PROCEDURAL) then
-					render.DrawSphere(HovEntBones[i], scale, 5, 5, BoneColor)
+			do
+				local BoneColor = BoneColor
+
+				for i = 0, HovEntBoneK do
+					if HovEnt:BoneHasFlag(i, BONE_USED_BY_VERTEX_LOD0) and not HovEnt:BoneHasFlag(i, BONE_ALWAYS_PROCEDURAL) then
+						renderDrawSphere(HovEntBones[i], scale, 5, 5, BoneColor)
+					end
 				end
 			end
 
-			render.OverrideBlend(false)
-			render.DrawSphere(HovBonePos, scale, 5, 5, G)
+			renderOverrideBlend(false)
+			renderDrawSphere(HovBonePos, scale, 5, 5, G)
 
 			return true
 		end
 	end
 
 	do
+		local surfaceSetTextColor, surfaceDrawRect, surfaceSetTextPos, surfaceSetFont, surfaceSetDrawColor, surfaceDrawText = surface.SetTextColor, surface.DrawRect, surface.SetTextPos, surface.SetFont, surface.SetDrawColor, surface.DrawText
 		function TOOL:DrawSelection2D()
-			surface.SetFont("Trebuchet18")
-			surface.SetTextColor(255, 255, 255)
-			surface.SetDrawColor(50, 50, 50, 200)
+			surfaceSetFont("Trebuchet18")
+			surfaceSetTextColor(255, 255, 255)
+			surfaceSetDrawColor(50, 50, 50, 200)
 			local x, y
 
 			do
@@ -987,8 +1019,6 @@ do
 	end
 
 	do
-		local icons = { Material("godsenttools/rotlocscale/select_7.png", "alphatest mips ignorez"), Material("godsenttools/rotlocscale/move_9.png", "alphatest mips ignorez"), Material("godsenttools/rotlocscale/rotate_4.png", "alphatest mips ignorez"), (Material("godsenttools/rotlocscale/scale_3.png", "alphatest mips ignorez")) }
-
 		do
 			local surfaceDrawTexturedRect, surfaceSetMaterial, surfaceSetDrawColor, surfaceDrawRect = surface.DrawTexturedRect, surface.SetMaterial, surface.SetDrawColor, surface.DrawRect
 
@@ -996,24 +1026,32 @@ do
 				surfaceSetDrawColor(75, 75, 75)
 				surfaceDrawRect(0, 0, w, h)
 				surfaceSetDrawColor(255, 255, 255)
-				surfaceSetMaterial(icons[self:GetOperation() + 1])
+				local op = self.SelectionMode and 1 or self:GetOperation() + 1
+				surfaceSetMaterial(icons[op])
 				surfaceDrawTexturedRect(10, 10, 64, 64)
-				surface.SetTextColor(255, 255, 255)
-				surface.SetFont("DermaLarge")
-				local t = "This is a Beta version of LocRotScale. Report issues to Spar#6665."
-				local len, th = surface.GetTextSize(t)
-				surface.SetTextPos(w * 2 - (SysTime() * 100) % (w * 2 + len), h - th - 10)
-				surface.DrawText(t)
-				surface.SetFont("Trebuchet24")
-				len, th = surface.GetTextSize(t)
-				surface.SetTextPos(64 + 10 + 10, 10)
-				surface.DrawText("Mode: " .. self:GetOperation())
-				surface.SetTextPos(64 + 10 + 10, 10 + th + 5)
-				surface.DrawText("BoneMode: " .. (self.TargetBoneMode and "phys" or "bone"))
 
-				if self.Pressed then
-					surface.SetTextPos(64 + 10 + 10, 10 + (th + 5) * 2)
-					surface.DrawText("Pressed")
+				do
+					surface.SetTextColor(255, 255, 255)
+					surface.SetFont("DermaLarge")
+					local t = "This is a Beta version of LocRotScale. Report issues to Spar#6665."
+					local len, th = surface.GetTextSize(t)
+					surface.SetTextPos(w * 2 - (SysTime() * 100) % (w * 2 + len), h - th - 10)
+					surface.DrawText(t)
+					surface.SetFont("Trebuchet24")
+					len, th = surface.GetTextSize(t)
+					surface.SetTextPos(64 + 10 + 10, 10)
+					surface.DrawText("Mode: " .. op)
+					surface.SetTextPos(64 + 10 + 10, 10 + th + 5)
+					surface.DrawText("BoneMode: ")
+					surface.DrawText(self.TargetBoneMode and "phys" or "bone")
+
+					if self.SelectionMode then
+						surface.SetTextPos(64 + 10 + 10, 10 + (th + 5) * 2)
+						surface.DrawText("SHIFT")
+					elseif self.Pressed then
+						surface.SetTextPos(64 + 10 + 10, 10 + (th + 5) * 2)
+						surface.DrawText("Pressed")
+					end
 				end
 			end
 		end
@@ -1069,7 +1107,7 @@ do
 
 					do
 						local padding = icon + 10
-						drawRoundedBox(10, wicon - 5, 165 + op * icon_iconshift, padding, padding, Color3)
+						drawRoundedBox(10, wicon - 5, 165 + (self.SelectionMode and 0 or op) * icon_iconshift, padding, padding, Color3)
 					end
 
 					renderPushFilterMag(3)

@@ -8,7 +8,9 @@ net.Receive("GodSentToolsLocRotScale", function(len, ply)
 	if not tool then return end
 	local event = net.ReadUInt(1)
 
-	if event == 0 then
+	if event == 1 then
+		tool:SetOperation(net.ReadUInt(2) + 1)
+	elseif event == 0 then
 		local ent = net.ReadEntity()
 		if not ent:IsValid() then return end
 		local bonen = net.ReadUInt(8)
