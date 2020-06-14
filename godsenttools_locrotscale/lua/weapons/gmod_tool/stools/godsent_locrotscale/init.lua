@@ -300,15 +300,22 @@ do
 	end
 end
 
+local VersionChecked
+
 function TOOL:Deploy()
 	self.RefreshCache = true
-	http.Fetch("https://github.com/GitSparTV/GodSentTools/raw/master/godsenttools_locrotscale/lua/weapons/gmod_tool/stools/godsent_locrotscale.lua",function(b)
-		local ver = b:match("^TOOL.LOCROTSCALEVERSION = \"(.-)\"\n")
-		if ver and self.LOCROTSCALEVERSION ~= ver then
-			self:GetOwner():ChatPrint("You are using an outdated version of LocRotScale. Please update in from it GitHub.")
-			print("You are using an outdated version of LocRotScale. Please update in from it GitHub.")
-		end
-	end)
+
+	if not VersionChecked then
+		http.Fetch("https://github.com/GitSparTV/GodSentTools/raw/master/godsenttools_locrotscale/lua/weapons/gmod_tool/stools/godsent_locrotscale.lua", function(b)
+			local ver = b:match("^TOOL.LOCROTSCALEVERSION = \"(.-)\"\n")
+			VersionChecked = true
+
+			if ver and self.LOCROTSCALEVERSION ~= ver then
+				self:GetOwner():ChatPrint("You are using an outdated version of LocRotScale. Please update in from it GitHub.")
+				print("You are using an outdated version of LocRotScale. Please update in from it GitHub.")
+			end
+		end)
+	end
 end
 --[[
 if self:GetOwner():KeyDown(IN_SPEED) then
