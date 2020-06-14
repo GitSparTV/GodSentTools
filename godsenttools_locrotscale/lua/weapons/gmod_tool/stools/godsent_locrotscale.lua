@@ -118,11 +118,11 @@ do
 		self.BonePos, self.BoneAng = Vector(), Angle()
 
 		if SERVER then
-			local phys = self.BoneToPhysBone(ent,bonen)
+			local phys = ent:TranslateBoneToPhysBone(bonen)
 
-			-- if ent:TranslatePhysBoneToBone(phys) ~= bonen then
-			-- 	phys = -2
-			-- end
+			if ent:TranslatePhysBoneToBone(phys) ~= bonen then
+				phys = -2
+			end
 			local count = ent:GetPhysicsObjectCount()
 			if count == 1 then
 				phys = 0
