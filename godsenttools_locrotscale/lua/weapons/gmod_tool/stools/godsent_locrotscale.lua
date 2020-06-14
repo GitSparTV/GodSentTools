@@ -1,4 +1,5 @@
-TOOL.Category = "Construction"
+TOOL.LOCROTSCALEVERSION = "0.1.3"
+TOOL.Category = "GodSent Tools"
 TOOL.Name = "#tool.godsent_locrotscale.name"
 TOOL.ClientConVar["propkey"] = KEY_N
 TOOL.ClientConVar["proptoggle"] = 0
