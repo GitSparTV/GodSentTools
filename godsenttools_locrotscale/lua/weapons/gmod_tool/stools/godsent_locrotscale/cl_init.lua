@@ -170,9 +170,9 @@ do
 
 				self:RotationThink(t)
 			end
+
 			self:ModeSelectorThink(ply, LeftClick)
 		end
-
 	end
 end
 
@@ -466,6 +466,7 @@ do
 
 	do
 		local surfaceSetTextColor, surfaceDrawRect, surfaceSetTextPos, surfaceSetFont, surfaceSetDrawColor, surfaceDrawText = surface.SetTextColor, surface.DrawRect, surface.SetTextPos, surface.SetFont, surface.SetDrawColor, surface.DrawText
+
 		function TOOL:DrawSelection2D()
 			surfaceSetFont("Trebuchet18")
 			surfaceSetTextColor(255, 255, 255)
@@ -496,6 +497,7 @@ do
 		local Frame
 		local ParentColor, ChildColor, BoneColor, R = Color(150, 150, 150, 200), Color(255, 255, 255, 200), Color(200, 200, 200), Color(255, 0, 0)
 		local renderDrawBeam, renderDrawSphere, renderSetColorMaterialIgnoreZ, SysTime, camEnd3D, camStart3D = render.DrawBeam, render.DrawSphere, render.SetColorMaterialIgnoreZ, SysTime, cam.End3D, cam.Start3D
+
 		function TOOL:SelectionShowBone(E, bonen)
 			local children = E:GetChildBones(bonen)
 			local parent = E:GetBoneParent(bonen)
@@ -529,6 +531,7 @@ do
 
 					do
 						local ChildColor = ChildColor
+
 						for k, v in ipairs(children) do
 							local pos = E:GetBonePosition(v)
 
@@ -542,6 +545,7 @@ do
 
 					do
 						local ParentColor = ParentColor
+
 						if parent ~= -1 then
 							local pos = E:GetBonePosition(parent)
 
@@ -567,8 +571,9 @@ do
 			end)
 		end
 
-do
+		do
 			local netWriteUInt, netWriteEntity, netStart, netSendToServer = net.WriteUInt, net.WriteEntity, net.Start, net.SendToServer
+
 			function TOOL:SelectionSetBone(E, bonen)
 				netStart("GodSentToolsLocRotScale")
 				netWriteUInt(0, 1)
@@ -576,7 +581,7 @@ do
 				netWriteUInt(bonen, 8)
 				netSendToServer()
 			end
-end
+		end
 
 		function TOOL:SelectionMenu(E, t)
 			if not E or not E:IsValid() then return end
@@ -752,6 +757,7 @@ do
 	local ToDegVector = Vector()
 	local RotationDegText, RotationDegTextLen, RotationDegTextH
 	local IN_SPEED, surfaceGetTextSize, surfaceSetFont, LocalPlayer, mathNormalizeAngle = IN_SPEED, surface.GetTextSize, surface.SetFont, LocalPlayer, math.NormalizeAngle
+
 	function TOOL:RotationThink(t)
 		local E, bone = self.TargetEntity, self.TargetBone
 		local P, A = self.BonePos, self.BoneAng
@@ -1154,6 +1160,14 @@ do
 					surface.DrawText(t)
 					surface.SetFont("Trebuchet24")
 					len, th = surface.GetTextSize(t)
+
+					do
+						local VL = surface.GetTextSize(self.LOCROTSCALEVERSION)
+						surface.SetTextPos((w - VL - 80) * 0.5, h - th - 50)
+					end
+
+					surface.DrawText("Version: ")
+					surface.DrawText(self.LOCROTSCALEVERSION)
 					surface.SetTextPos(64 + 10 + 10, 10)
 					surface.DrawText("Mode: " .. op)
 					surface.SetTextPos(64 + 10 + 10, 10 + th + 5)
