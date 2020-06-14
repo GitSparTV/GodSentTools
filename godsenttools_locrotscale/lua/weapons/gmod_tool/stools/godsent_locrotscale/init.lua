@@ -26,42 +26,52 @@ local function BoneToPhysBone(ent, bone)
 
 	return nil
 end
+
 TOOL.BoneToPhysBone = BoneToPhysBone
 
-local function SetBoneOffsets(ent,ostable,sbone)
-	local RTable = {}
-	RTable[0] = {}
+local function SetBoneOffsets(ent, ostable, sbone)
+	local RTable = { }
+	RTable[0] = { }
 	RTable[0].pos = ostable[0].pos
 	RTable[0].ang = ostable[0].ang
+
 	if sbone.b == 0 then
 		RTable[0].pos = sbone.p
 		RTable[0].ang = sbone.a
 	end
-	for i=1,ent:GetBoneCount()-1 do
-		local pb = BoneToPhysBone(ent,i)
+
+	for i = 1, ent:GetBoneCount() - 1 do
+		local pb = BoneToPhysBone(ent, i)
+
 		if ostable[pb] then
 			local parent = ostable[pb].parent
 			local bn = ent:GetBoneName(i)
-			local ppos,pang = RTable[parent].pos,RTable[parent].ang
-			local pos,ang = LocalToWorld(ostable[pb].pos,ostable[pb].ang,ppos,pang)
+			local ppos, pang = RTable[parent].pos, RTable[parent].ang
+			local pos, ang = LocalToWorld(ostable[pb].pos, ostable[pb].ang, ppos, pang)
+
 			if pb == sbone.b then
 				pos = sbone.p
 				ang = sbone.a
 			end
-			RTable[pb] = {}
-			RTable[pb].pos = pos*1
-			RTable[pb].ang = ang*1
+
+			RTable[pb] = { }
+			RTable[pb].pos = pos * 1
+			RTable[pb].ang = ang * 1
 		end
 	end
+
 	return RTable
 end
 
-local function SetOffsets(tool,ent,ostable,physbone, physpos, physang)
-	
-	local postable = SetBoneOffsets(ent,ostable,{b = physbone,p = physpos,a = physang})
+local function SetOffsets(tool, ent, ostable, physbone, physpos, physang)
+	local postable = SetBoneOffsets(ent, ostable, {
+		b = physbone,
+		p = physpos,
+		a = physang
+	})
 
-	for i=0,ent:GetPhysicsObjectCount()-1 do
-		if postable[i] and !postable[i].dontset then
+	for i = 0, ent:GetPhysicsObjectCount() - 1 do
+		if postable[i] and not postable[i].dontset then
 			local obj = ent:GetPhysicsObjectNum(i)
 			-- postable[i].pos.x = math.Round(postable[i].pos.x,3)
 			-- postable[i].pos.y = math.Round(postable[i].pos.y,3)
@@ -69,11 +79,10 @@ local function SetOffsets(tool,ent,ostable,physbone, physpos, physang)
 			-- postable[i].ang.p = math.Round(postable[i].ang.p,3)
 			-- postable[i].ang.y = math.Round(postable[i].ang.y,3)
 			-- postable[i].ang.r = math.Round(postable[i].ang.r,3)
-			
-			local poslen = postable[i].pos:Length();
-			local anglen = Vector(postable[i].ang.p,postable[i].ang.y,postable[i].ang.r):Length();
-			
-			//Temporary solution for INF and NaN decimals crashing the game (Even rounding doesnt fix it)
+			local poslen = postable[i].pos:Length()
+			local anglen = Vector(postable[i].ang.p, postable[i].ang.y, postable[i].ang.r):Length()
+
+			--Temporary solution for INF and NaN decimals crashing the game (Even rounding doesnt fix it)
 			if poslen > 2 and anglen > 2 then
 				obj:EnableMotion(true)
 				obj:Wake()
@@ -85,6 +94,7 @@ local function SetOffsets(tool,ent,ostable,physbone, physpos, physang)
 		end
 	end
 end
+
 TOOL.SetOffsets = SetOffsets
 
 do
@@ -136,7 +146,6 @@ do
 				-- p:SetPos(temp)
 				p:EnableMotion(false)
 				p:Wake()
-
 				SetOffsets(self, self.TargetEntity, self.PhysBoneOffsetsKeys, self.TargetPhysBone, p:GetPos(), ang)
 			end
 		end
@@ -245,27 +254,34 @@ do
 	local PhysCache, PhysIDs = { }, { }
 
 	function TOOL:CachePhys(ent)
-	local RTable = {}
-	
-	RTable[0] = {}
-	RTable[0].pos = ent:GetPhysicsObjectNum(0):GetPos()
-	RTable[0].ang = ent:GetPhysicsObjectNum(0):GetAngles()
-	RTable[0].moving = ent:GetPhysicsObjectNum(0):IsMoveable()
-	
-	for i=1,ent:GetBoneCount()-1 do
-		local pb = BoneToPhysBone(ent,i)
-		local parent = GetPhysBoneParent(ent,pb)
-		if pb and pb != 0 and parent and !RTable[pb] then
-			local obj1 = ent:GetPhysicsObjectNum(pb)
-			debugoverlay.Text( obj1:GetPos(), pb, 5)
-			local obj2 = ent:GetPhysicsObjectNum(parent)
-			local pos1,ang1 = obj1:GetPos(),obj1:GetAngles()
-			local pos2,ang2 = obj2:GetPos(),obj2:GetAngles()
-			local pos3,ang3 = WorldToLocal(pos1,ang1,pos2,ang2)
-			local mov = obj1:IsMoveable()
-			RTable[pb] = {pos = pos3,ang = ang3,moving = mov,parent = parent}
+		local RTable = { }
+		RTable[0] = { }
+		RTable[0].pos = ent:GetPhysicsObjectNum(0):GetPos()
+		RTable[0].ang = ent:GetPhysicsObjectNum(0):GetAngles()
+		RTable[0].moving = ent:GetPhysicsObjectNum(0):IsMoveable()
+
+		for i = 1, ent:GetBoneCount() - 1 do
+			local pb = BoneToPhysBone(ent, i)
+			local parent = GetPhysBoneParent(ent, pb)
+
+			if pb and pb ~= 0 and parent and not RTable[pb] then
+				local obj1 = ent:GetPhysicsObjectNum(pb)
+				debugoverlay.Text(obj1:GetPos(), pb, 5)
+				local obj2 = ent:GetPhysicsObjectNum(parent)
+				local pos1, ang1 = obj1:GetPos(), obj1:GetAngles()
+				local pos2, ang2 = obj2:GetPos(), obj2:GetAngles()
+				local pos3, ang3 = WorldToLocal(pos1, ang1, pos2, ang2)
+				local mov = obj1:IsMoveable()
+
+				RTable[pb] = {
+					pos = pos3,
+					ang = ang3,
+					moving = mov,
+					parent = parent
+				}
+			end
 		end
-	end
+
 		self.PhysBoneOffsetsKeys = RTable
 	end
 end
