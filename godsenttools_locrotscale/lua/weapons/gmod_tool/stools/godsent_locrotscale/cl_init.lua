@@ -25,19 +25,9 @@ local function Round(n, decimals)
 	return ceiloor(n / decimals) * decimals
 end
 
-local icons = { Material("godsenttools/rotlocscale/select_7.png", "alphatest mips ignorez"), Material("godsenttools/rotlocscale/move_9.png", "alphatest mips ignorez"), Material("godsenttools/rotlocscale/rotate_4.png", "alphatest mips ignorez"), (Material("godsenttools/rotlocscale/scale_3.png", "alphatest mips ignorez")) }
+local icons = {Material("godsenttools/rotlocscale/select_7.png", "alphatest mips ignorez"), Material("godsenttools/rotlocscale/move_9.png", "alphatest mips ignorez"), Material("godsenttools/rotlocscale/rotate_4.png", "alphatest mips ignorez"), (Material("godsenttools/rotlocscale/scale_3.png", "alphatest mips ignorez"))}
 
 local R, G, B, Y, Hover = Color(255, 0, 0, 150), Color(0, 255, 0, 150), Color(0, 0, 255, 150), Color(255, 200, 0, 150), Color(255, 255, 0)
-local NumToColor
-
-do
-	local R, G, B, Y = Color(255, 0, 0), Color(0, 255, 0), Color(0, 0, 255), Color(255, 200, 0)
-
-	NumToColor = {
-		[0] = R,
-G, B, Y
-	}
-end
 
 do
 	local netReadEntity, netReadAngle, netReadBool, netReadVector, LocalPlayer, netReadDouble, netReadUInt, netReadNormal, bitband = net.ReadEntity, net.ReadAngle, net.ReadBool, net.ReadVector, LocalPlayer, net.ReadDouble, net.ReadUInt, net.ReadNormal, bit.band
@@ -68,7 +58,9 @@ do
 		elseif event == 1 then
 			local op = tool:GetOperation()
 
-			if op == 2 then
+			if op == 1 then
+				tool:MoveStart(netReadNormal(), netReadAngle(), netReadVector(), netReadUInt(3), netReadBool())
+			elseif op == 2 then
 				tool:RotateStart(netReadNormal(), netReadNormal(), netReadAngle(), netReadAngle(), netReadDouble(), netReadUInt(2))
 			end
 		elseif event == 5 then
@@ -153,12 +145,23 @@ do
 			do
 				local size = P - t.StartPos
 				self.EntityDistance = size
-				self.EntityDistanceLen = size:Length() * 0.3
+				self.EntityDistanceLen = size:Length() * 0.25
 			end
 
 			self:PropertiesThink(E, P, A, S)
 
-			if op == 2 then
+			if op == 1 then
+				if self.Pressed then
+					-- ply:DrawViewModel(false)
+					if LeftClick then
+						self:MoveEnd()
+
+						return
+					end
+				end
+
+				self:MovingThink(t)
+			elseif op == 2 then
 				if self.Pressed then
 					-- ply:DrawViewModel(false)
 					if LeftClick then
@@ -199,13 +202,13 @@ do
 					deg = mathatan2(DX, DY)
 				end
 
-				-- if deg <= 1.0471975511966 and deg > -1.0471975511966 then
-				-- self.ModeSelectorHovered = 2
-				-- elseif deg > 1.0471975511966 and deg < 3.1415926535898 then
-				-- self.ModeSelectorHovered = 4
-				-- else
-				self.ModeSelectorHovered = 3
-				-- end
+				if deg <= 1.0471975511966 and deg > -1.0471975511966 then
+					self.ModeSelectorHovered = 2
+					-- elseif deg > 1.0471975511966 and deg < 3.1415926535898 then
+					-- self.ModeSelectorHovered = 4
+				else
+					self.ModeSelectorHovered = 3
+				end
 			elseif self.RightPressed then
 				do
 					local H = self.ModeSelectorHovered
@@ -226,7 +229,7 @@ do
 	end
 
 	do
-		local iconsOffsets = { nil, -32, -64 - 32 - 16, 37, 8, -(64 + 37), 8 }
+		local iconsOffsets = {nil, -32, -64 - 32 - 16, 37, 8, -(64 + 37), 8}
 
 		local surfaceDrawTexturedRect, drawRoundedBox, Color1, ScrW, surfaceSetMaterial, Color2, Color3, surfaceSetDrawColor, ScrH, renderPopFilterMag, renderPushFilterMag, renderPopFilterMin, renderPushFilterMin = surface.DrawTexturedRect, draw.RoundedBox, Color(75, 75, 75), ScrW, surface.SetMaterial, Color(50, 50, 50), Color(0, 0, 0, 100), surface.SetDrawColor, ScrH, render.PopFilterMag, render.PushFilterMag, render.PopFilterMin, render.PushFilterMin
 
@@ -248,7 +251,7 @@ do
 				surfaceSetMaterial(icons[k])
 				surfaceDrawTexturedRect(CW + iconsOffsets[(k - 1) * 2], CH + iconsOffsets[(k - 1) * 2 + 1], 64, 64)
 
-				if k == 2 or k == 4 then
+				if k == 4 then
 					drawRoundedBox(10, CW + iconsOffsets[(k - 1) * 2] - 8, CH + iconsOffsets[(k - 1) * 2 + 1] - 8, 64 + 16, 64 + 16, Color3)
 					surfaceSetDrawColor(255, 255, 255)
 				end
@@ -301,14 +304,18 @@ do
 
 			size = size * (0.02 / 0.03)
 
-			if op == 2 then
+			if op == 1 then
+				self:DrawMoving3D(P, size)
+			elseif op == 2 then
 				self:DrawRotation3D(P, size)
 			end
 
 			-- cam.IgnoreZ(false)
 			camEnd()
 
-			if op == 2 then
+			if op == 1 then
+				self:DrawMoving2D(P, size)
+			elseif op == 2 then
 				self:DrawRotation2D(P, size)
 			end
 
@@ -338,8 +345,8 @@ do
 end
 
 do
-	local HovEntBones, HovBoneChildren, HovEnt, HovBone, HovBoneParent, HovEntBoneK, HovBoneName, HovBoneNameLen, HovBoneNameH = { }, { }
-	local TempParentInfo = { }
+	local HovEntBones, HovBoneChildren, HovEnt, HovBone, HovBoneParent, HovEntBoneK, HovBoneName, HovBoneNameLen, HovBoneNameH = {}, {}
+	local TempParentInfo = {}
 
 	do
 		local surfaceGetTextSize, mathhuge, surfaceSetFont, BONE_USED_BY_VERTEX_LOD0, BONE_ALWAYS_PROCEDURAL = surface.GetTextSize, math.huge, surface.SetFont, BONE_USED_BY_VERTEX_LOD0, BONE_ALWAYS_PROCEDURAL
@@ -626,8 +633,8 @@ do
 				col4:SetMaxWidth(50)
 			end
 
-			local BonesParents = { }
-			local BonesInfo = { }
+			local BonesParents = {}
+			local BonesInfo = {}
 			local k = E:GetBoneCount()
 
 			do
@@ -749,7 +756,248 @@ do
 end
 
 do
-	local RotationDisks, RotationDisksLen = { }, 0
+	local Axis = {}
+
+	-- local ToDegVector = Vector()
+	local function AxisDrag(center, planeNormal, rayOrigin, rayDirection, size, tolerance, ang, pr)
+		local hitpos = util.IntersectRayWithPlane(rayOrigin, rayDirection, center, planeNormal)
+		if not hitpos then return end
+		local localized = WorldToLocal(hitpos, angle_zero, center, ang)
+		local x, y, z = localized:Unpack()
+		-- if pr then print(x,y,z) end
+		y, z = y * y, z * z
+		if 0 < x and x ^ 2 <= size and y <= tolerance and z <= tolerance then return true end -- debugoverlay.Cross(hitpos, 1, 1, nil, true)
+		-- dist:Normalize()
+		-- return dist, hitpos, distdelta
+	end
+
+	local function PlaneDrag(center, planeNormal, rayOrigin, rayDirection, size, tolerance)
+		local hitpos = util.IntersectRayWithPlane(rayOrigin, rayDirection, center, planeNormal)
+		if not hitpos then return end
+		local dist = hitpos - center
+		-- if distdelta > tolerance then return end
+		local mtol = -tolerance
+		local x, y, z = dist:Unpack()
+		x, y, z = x * x, y * y, z * z
+		if -1 <= x and x <= 1 and mtol <= y and y <= tolerance and mtol <= z and z <= tolerance then return dist end
+		-- if SERVER then
+		-- end
+		-- dist:Normalize()
+		-- return dist, hitpos, distdelta
+	end
+
+	local PivotMin1, PivotMin2, PivotMax1, PivotMax2 = Vector(), Vector(), Vector(), Vector()
+	function TOOL:MovingThink(t)
+		-- local E, bone = self.TargetEntity, self.TargetBone
+		local scale = self.EntityDistance
+		if not self.Pressed then
+			local P, A = self.BonePos, self.BoneAng
+			local ux, uy, uz = A:Forward(), A:Right(), A:Up()
+			scale = scale:LengthSqr()
+			local hscale = scale * (0.25 ^ 2)
+			local tolerance = hscale * 0.002
+			local EyePos, TraceNormal = t.StartPos, t.Normal
+
+			if AxisDrag(P, uy, EyePos, TraceNormal, hscale, tolerance, A) then
+				self.MovingHoveredAxis = 0
+			elseif AxisDrag(P, uz, EyePos, TraceNormal, hscale, tolerance, (uy):AngleEx(uz), true) then
+				self.MovingHoveredAxis = 1
+			elseif AxisDrag(P, ux, EyePos, TraceNormal, hscale, tolerance, (uz):AngleEx(ux)) then
+				self.MovingHoveredAxis = 2
+			else
+				self.MovingHoveredAxis = nil
+			end
+
+			scale = (scale ^ 0.5) * 0.25
+			ux:Mul(scale)
+			uy:Mul(scale)
+			uz:Mul(scale)
+			Axis[0] = P + ux
+			Axis[1] = P + uy
+			Axis[2] = P + uz
+			local planetol = hscale * 0.005
+
+			do
+				local pos = Axis[1] + Axis[2]
+				pos:Div(2)
+
+				if PlaneDrag(pos, ux, EyePos, TraceNormal, hscale, planetol) then
+					self.MovingHoveredAxis = 3
+				end
+
+				Axis[3] = pos
+			end
+
+			Axis[4] = A
+			local sqrtplanetol = planetol ^ 0.5
+			Axis[5] = Vector(0, -sqrtplanetol, -sqrtplanetol)
+			Axis[6] = Vector(0.1, sqrtplanetol, sqrtplanetol)
+
+			do
+				local pos = Axis[0] + Axis[2]
+				pos:Div(2)
+
+				if PlaneDrag(pos, uy, EyePos, TraceNormal, hscale, planetol) then
+					self.MovingHoveredAxis = 4
+				end
+
+				Axis[7] = pos
+			end
+
+			Axis[8] = (uy):AngleEx(uz)
+
+			do
+				local pos = Axis[0] + Axis[1]
+				pos:Div(2)
+
+				if PlaneDrag(pos, uz, EyePos, TraceNormal, hscale, planetol) then
+					self.MovingHoveredAxis = 5
+				end
+
+				Axis[9] = pos
+			end
+
+			Axis[10] = (uz):AngleEx(uy)
+		else
+			local P = self.MovingOriginalPos
+			scale = scale:Length() * 0.25
+			local dir = self.MovingDirAngle:Forward()
+			dir:Mul(16500)
+			Axis[0] = P + dir
+			Axis[1] = P + -dir
+			if self.MovingMode then
+				dir = self.MovingDirAngle:Right()
+				dir:Mul(16500)
+				Axis[2] = P + dir
+				Axis[3] = P + -dir
+			end
+
+			local size = self.MovingOriginalPos - t.StartPos
+			size = size:Length() * (0.25 * 0.03)
+			Axis[-1] = size
+
+			do
+				local PivotMin1, PivotMin2 = PivotMin1, PivotMin2
+
+				do
+					local msize = -size
+					PivotMin1:SetUnpacked(msize, msize, msize)
+					PivotMin2:SetUnpacked(msize, msize, msize)
+				end
+
+				local PivotMax1, PivotMax2 = PivotMax1, PivotMax2
+				PivotMax1:SetUnpacked(size, size, size)
+				PivotMax2:SetUnpacked(size, size, size)
+				PivotMin2:Mul(0.7)
+				PivotMax2:Mul(0.7)
+				Axis[4], Axis[5], Axis[6], Axis[7] = PivotMin1, PivotMax1, PivotMin2, PivotMax2
+			end
+		end
+	end
+
+	local NumToColor, NumTo2Color
+
+	do
+		-- NumToAxis = {
+		-- 	[0] = R, G, B, R, G, B
+		-- }
+		local R, G, B = Color(255, 0, 0), Color(0, 255, 0), Color(0, 0, 255)
+
+		NumToColor = {
+			[0] = R,
+G, B, B, G, B
+		}
+		NumTo2Color = {[3] = G, [4] = B, [5] = B}
+
+	end
+	local BL, Y = Color(0,0,0,200), Color(255,100,0,200)
+
+	function TOOL:DrawMoving3D(P, size)
+		-- local E = self.TargetEntity
+		if not self.Pressed and not isvector(Axis[4]) then
+			local Hovered = self.MovingHoveredAxis
+
+			do
+				local R = R
+
+				if Hovered == 0 then
+					R = Hover
+				end
+
+				render.DrawBeam(P, Axis[0], size, 0, 1, R)
+			end
+
+			do
+				local G = G
+
+				if Hovered == 1 then
+					G = Hover
+				end
+
+				render.DrawBeam(P, Axis[1], size, 0, 1, G)
+			end
+
+			do
+				local B = B
+
+				if Hovered == 2 then
+					B = Hover
+				end
+
+				render.DrawBeam(P, Axis[2], size, 0, 1, B)
+			end
+
+			do
+				local R = R
+
+				if Hovered == 3 then
+					R = Hover
+				end
+
+				render.DrawBox(Axis[3], Axis[4], Axis[5], Axis[6], R)
+			end
+
+			do
+				local G = G
+
+				if Hovered == 4 then
+					G = Hover
+				end
+
+				render.DrawBox(Axis[7], Axis[8], Axis[5], Axis[6], G)
+			end
+
+			do
+				local B = B
+
+				if Hovered == 5 then
+					B = Hover
+				end
+
+				render.DrawBox(Axis[9], Axis[10], Axis[5], Axis[6], B)
+			end
+		else
+			local num = self.MovingDirColor
+			render.DrawBeam(Axis[0], Axis[1], Axis[-1] * 0.3, 0, 1, NumToColor[num])
+			if self.MovingMode then
+				render.DrawBeam(Axis[2], Axis[3], Axis[-1] * 0.3, 0, 1, NumTo2Color[num])
+			end
+			local originalpos = self.MovingOriginalPos
+			local ang = self.BoneAng
+				render.DrawBox(originalpos, ang, Axis[4], Axis[5], BL)
+				render.DrawBox(originalpos, ang, Axis[6], Axis[7], Y)
+		end
+	end
+
+	function TOOL:DrawMoving2D(P, size)
+		-- render.DrawLine(P, P + A:Forward() * 100, R, true)
+		-- render.DrawLine(P, P + A:Right() * 100, G, true)
+		-- render.DrawLine(P, P + A:Up() * 100, B, true)
+	end
+end
+
+do
+	local RotationDisks, RotationDisksLen = {}, 0
 	local mathpi2, mathsin, mathcos = math.pi * 2, math.sin, math.cos
 	local step = math.rad(10)
 	local CheckDrag = TOOL.CheckDrag
@@ -987,6 +1235,16 @@ do
 	end
 
 	local renderAddBeam, renderDrawBeam, renderStartBeam, renderEndBeam = render.AddBeam, render.DrawBeam, render.StartBeam, render.EndBeam
+	local NumToColor
+
+	do
+		local R, G, B, Y = Color(255, 0, 0), Color(0, 255, 0), Color(0, 0, 255), Color(255, 200, 0)
+
+		NumToColor = {
+			[0] = R,
+G, B, Y
+		}
+	end
 
 	function TOOL:DrawRotation3D(P, size)
 		do

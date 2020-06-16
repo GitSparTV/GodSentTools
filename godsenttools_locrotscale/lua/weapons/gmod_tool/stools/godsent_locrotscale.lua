@@ -64,6 +64,8 @@ do
 
 		if op == 0 and tr.Entity then
 			return self:SelectTry(tr.Entity, tr)
+		elseif op == 1 then
+			self:MoveTry(tr)
 		elseif op == 2 then
 			self:RotateTry(tr)
 		end
@@ -172,7 +174,17 @@ do
 	function TOOL:CancelAction(op)
 		self.Pressed = false
 
-		if op == 2 then
+		if op == 1 then
+			if SERVER then
+				if self.TargetBoneMode then
+					self:SetOffsets(self.TargetEntity, self.PhysBoneOffsetsKeys, self.TargetPhysBone, self.MovingOriginal, self.BoneAng)
+				else
+					self.TargetEntity:ManipulateBonePosition(self.TargetBone, self.MovingOriginal)
+				end
+			end
+
+			self:MoveEnd()
+		elseif op == 2 then
 			if SERVER then
 				if self.TargetBoneMode then
 					self:SetOffsets(self.TargetEntity, self.PhysBoneOffsetsKeys, self.TargetPhysBone, self.TargetPhys:GetPos(), self.RotationOriginal)
@@ -191,6 +203,48 @@ do
 			netWriteUInt(2, 3)
 			netSend(self:GetOwner())
 		end
+	end
+end
+
+do
+	function TOOL:MoveStart(dir, ang, start, dircolor, mode)
+		self.Pressed = true
+		self.MovingDir = dir
+		self.MovingDirAngle = ang
+		self.MovingStart = start
+		self.MovingDirColor = dircolor
+		self.MovingMode = mode
+
+		if SERVER then
+			if self.TargetBoneMode then
+				self.MovingOriginal = self.TargetPhys:GetPos()
+				self:CachePhys(self.TargetEntity)
+			else
+				self.MovingOriginal = self.TargetEntity:GetManipulateBonePosition(self.TargetBone)
+			end
+		else
+			self.MovingOriginalPos = self.BonePos
+		end
+
+		if SERVER and game.SinglePlayer() then
+			net.Start("GodSentToolsLocRotScale")
+			net.WriteEntity(self.SWEP)
+			net.WriteUInt(1, 3)
+			net.WriteNormal(dir)
+			net.WriteAngle(ang)
+			net.WriteVector(start)
+			net.WriteUInt(dircolor, 3)
+			net.WriteBool(mode)
+			net.Send(self:GetOwner())
+		end
+	end
+end
+
+do
+	function TOOL:MoveEnd()
+		self.Pressed = false
+		self:GetOwner():DrawViewModel(true)
+		self.MovingDir, self.MovingStart, self.MovingDirColor = nil
 	end
 end
 
@@ -244,7 +298,7 @@ function TOOL:RotateEnd()
 end
 
 do
-	local HovEntBones = { }
+	local HovEntBones = {}
 
 	function TOOL:SelectTry(E, t)
 		if not E or not E:IsValid() then return end
@@ -280,6 +334,129 @@ do
 		end
 
 		return false
+	end
+end
+
+do
+	local function AxisDrag(center, planeNormal, rayOrigin, rayDirection, size, tolerance, ang, pr)
+		local hitpos = util.IntersectRayWithPlane(rayOrigin, rayDirection, center, planeNormal)
+		if not hitpos then return end
+		local localized = WorldToLocal(hitpos, angle_zero, center, ang)
+		local x, y, z = localized:Unpack()
+		y, z = y * y, z * z
+		if 0 < x and x * x <= size and y <= tolerance and z <= tolerance then
+			return hitpos
+		end
+	end
+
+	local function PlaneDrag(center, planeNormal, rayOrigin, rayDirection, size, tolerance)
+		local hitpos = util.IntersectRayWithPlane(rayOrigin, rayDirection, center, planeNormal)
+		if not hitpos then return end
+		local dist = hitpos - center
+		local mtol = -tolerance
+		local x,y,z = dist:Unpack()
+		x,y,z = x * x,y * y,z *  z
+		if x <= 1 and mtol <= y and y <= tolerance and mtol <= z and z <= tolerance then
+			return hitpos
+		end
+	end
+
+	function TOOL:MoveTry(t)
+		local E = self.TargetEntity
+
+		if E and E:IsValid() then
+			local touchdir, touchpos, touchdirang, touchcolor
+			local A, P = self.BoneAng, self.BonePos
+			local ux, uy, uz = A:Forward(), A:Right(), A:Up()
+			local EyePos = t.StartPos
+			local scale = P - EyePos
+			scale = scale:LengthSqr()
+			local hscale = scale * (0.25 ^ 2)
+			local tolerance = hscale * 0.002
+			local TraceNormal = t.Normal
+			local mode = false
+
+			do
+				local ang = A
+				local pos = AxisDrag(P, uy, EyePos, TraceNormal, hscale, tolerance, ang)
+
+				if pos then
+					touchdir, touchpos, touchdirang, touchcolor = uy, pos, ang, 0
+					goto found
+				end
+			end
+
+			do
+				local ang = (uy):AngleEx(uz)
+				local pos = AxisDrag(P, uz, EyePos, TraceNormal, hscale, tolerance, ang, true)
+
+				if pos then
+					touchdir, touchpos, touchdirang, touchcolor = uz, pos, ang, 1
+					goto found
+				end
+			end
+
+			do
+				local ang = (uz):AngleEx(ux)
+				local pos = AxisDrag(P, ux, EyePos, TraceNormal, hscale, tolerance, ang)
+
+				if pos then
+					touchdir, touchpos, touchdirang, touchcolor = ux, pos, ang, 2
+					goto found
+				end
+			end
+
+			mode = true
+			do
+				local planetol = hscale * 0.005
+	
+				scale = (scale ^ 0.5) * 0.25
+				ux:Mul(scale)
+				uy:Mul(scale)
+				uz:Mul(scale)
+				do
+					local pos = (P + uy) + (P + uz)
+					pos:Div(2)
+
+					pos = PlaneDrag(pos, ux, EyePos, TraceNormal, hscale, planetol)
+
+					if pos then
+						touchdir, touchpos, touchdirang, touchcolor = ux, pos, (uz):AngleEx(ux), 3
+						goto found
+					end
+				end
+			end
+
+			-- do
+			-- 	local pos = Axis[0] + Axis[2]
+			-- 	pos:Div(2)
+
+			-- 	if PlaneDrag(pos, uy, EyePos, TraceNormal, hscale, planetol) then
+			-- 		self.MovingHoveredAxis = 4
+			-- 	end
+
+			-- 	Axis[7] = pos
+			-- end
+
+			-- Axis[8] = (uy):AngleEx(uz)
+
+			-- do
+			-- 	local pos = Axis[0] + Axis[1]
+			-- 	pos:Div(2)
+
+			-- 	if PlaneDrag(pos, uz, EyePos, TraceNormal, hscale, planetol) then
+			-- 		self.MovingHoveredAxis = 5
+			-- 	end
+
+			-- 	Axis[9] = pos
+			-- end
+
+			-- Axis[10] = (uz):AngleEx(uy)
+
+			if not touchdir then return end
+			::found::
+			self:MoveStart(touchdir, touchdirang, WorldToLocal(P,touchdirang,touchpos,touchdirang), touchcolor, mode)
+		end
 	end
 end
 

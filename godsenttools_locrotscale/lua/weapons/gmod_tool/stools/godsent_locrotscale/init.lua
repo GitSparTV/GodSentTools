@@ -97,6 +97,56 @@ end
 
 TOOL.SetOffsets = SetOffsets
 
+function TOOL:ApplyMovement(pos, ang)
+	if not self.TargetBoneMode then
+		local E = self.TargetEntity
+		local origin = E:GetBonePosition(self.TargetBone)
+		if origin == E:GetPos() then
+			origin = E:GetBoneMatrix(self.TargetBone):GetTranslation()
+		end
+		-- print(WorldToLocal(pos,angle_zero,origin,ang))
+		pos:Sub(origin)
+		self.TargetEntity:ManipulateBonePosition(self.TargetBone, pos)
+		self.TargetEntity:ManipulateBoneAngles(self.TargetBone, ang)
+	elseif self.PhysBoneOffsetsKeys then
+		local p = self.TargetPhys
+		p:EnableMotion(true)
+		p:Wake()
+		p:SetAngles(ang)
+		p:SetPos(pos)
+		p:EnableMotion(false)
+		p:Wake()
+		SetOffsets(self, self.TargetEntity, self.PhysBoneOffsetsKeys, self.TargetPhysBone, pos, ang)
+	end
+end
+
+do
+	function TOOL:MoveThink(E)
+		local P = self.BonePos
+		local dir = self.MovingDir
+		local dira = self.MovingDirAngle
+		local start = self.MovingStart
+		local t = self:GetOwner():GetEyeTrace()
+		local hitpos = util.IntersectRayWithPlane(t.StartPos, t.Normal, P, dir)
+		if not hitpos then return end
+		-- debugoverlay.Cross(hitpos, 1, 10)
+		if not self.MovingMode then
+			local localized = WorldToLocal(hitpos, angle_zero, P, dira)
+			localized = Vector(localized.x, 0, 0)
+			intersect = LocalToWorld(localized, angle_zero, P, dira)
+			local pos = LocalToWorld(Vector(start.x, 0, 0), angle_zero, intersect, dira)
+			self:ApplyMovement(pos, self.BoneAng)
+		else
+			local pos = LocalToWorld(start,angle_zero,hitpos,dira)
+			self:ApplyMovement(pos, self.BoneAng)
+		end
+
+		if not self:GetOwner():KeyDown(IN_ATTACK) then
+			self:MoveEnd()
+		end
+	end
+end
+
 do
 	local ToDegVector, DegToAngle = Vector(), Angle()
 	local vector_origin, WorldToLocal, utilIntersectRayWithPlane, IN_ATTACK, IN_SPEED, LocalToWorld = vector_origin, WorldToLocal, util.IntersectRayWithPlane, IN_ATTACK, IN_SPEED, LocalToWorld
@@ -134,20 +184,7 @@ do
 			local ang
 			temp, ang = LocalToWorld(vector_origin, DegToAngle, EPos, RotationDirAng)
 			temp, ang = LocalToWorld(vector_origin, self.RotationStartAng, EPos, ang)
-
-			-- p:SetPos(temp)
-			if not self.TargetBoneMode then
-				self.TargetEntity:ManipulateBoneAngles(self.TargetBone, ang)
-			elseif self.PhysBoneOffsetsKeys then
-				local p = self.TargetPhys
-				p:EnableMotion(true)
-				p:Wake()
-				p:SetAngles(ang)
-				-- p:SetPos(temp)
-				p:EnableMotion(false)
-				p:Wake()
-				SetOffsets(self, self.TargetEntity, self.PhysBoneOffsetsKeys, self.TargetPhysBone, p:GetPos(), ang)
-			end
+			self:ApplyMovement(temp, ang)
 		end
 
 		::skip::
@@ -305,13 +342,12 @@ do
 		if self.Pressed then
 			local op = self:GetOperation()
 
-			--[[ 			if op == 1 then
-
-			else--]]
-			if op == 2 then
+			if op == 1 then
+				self:MoveThink(self.TargetEntity)
+			elseif op == 2 then
 				self:RotateThink(self.TargetEntity)
-				-- elseif op == 3 then
 			end
+			-- elseif op == 3 then
 		end
 	end
 end
