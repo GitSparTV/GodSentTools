@@ -477,7 +477,7 @@ do
 				local EyePos = t.StartPos
 				local dist = P - EyePos
 				local D = dist:Angle():Forward()
-				dist = dist:LengthSqr() * (0.3 ^ 2)
+				dist = dist:LengthSqr() * (0.25 ^ 2)
 				local tolerance = dist * 0.1
 				local TraceNormal = t.Normal
 				local CheckDrag = CheckDrag

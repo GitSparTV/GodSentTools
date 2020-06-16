@@ -431,7 +431,7 @@ do
 			local HovEntBones = HovEntBones
 			local HovBonePos = HovEntBones[HovBone]
 			local scale = HovBonePos - EyePos()
-			scale = scale:Length() * (0.3 * 0.02)
+			scale = scale:Length() * (0.25 * 0.02)
 			local OutlineColor = OutlineColor
 
 			do
@@ -1023,7 +1023,7 @@ do
 			scale = scale:LengthSqr()
 
 			do
-				local hscale = scale * (0.3 ^ 2)
+				local hscale = scale * (0.25 ^ 2)
 				local tolerance = hscale * 0.1
 				local EyePos, TraceNormal = t.StartPos, t.Normal
 				local CheckDrag = CheckDrag
@@ -1068,7 +1068,7 @@ do
 				self.RotationHoverDisk = dircolor
 			end
 
-			scale = (scale ^ 0.5) * 0.3
+			scale = (scale ^ 0.5) * 0.25
 
 			do
 				local AMul = ux.Mul
@@ -1150,7 +1150,7 @@ do
 
 			RotationDisksLen = i
 		else
-			RotationDisks = { }
+			RotationDisks = {}
 			local LU, LR
 
 			do
@@ -1158,7 +1158,7 @@ do
 				LU, LR = LA:Up(), LA:Right()
 			end
 
-			scale = scale:Length() * 0.3
+			scale = scale:Length() * 0.25
 
 			do
 				local cur, hit = GetPlaneNormal(P, self.RotationDir, t.StartPos, t.Normal)
