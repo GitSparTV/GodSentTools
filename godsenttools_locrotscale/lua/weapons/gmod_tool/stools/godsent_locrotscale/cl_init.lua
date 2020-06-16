@@ -382,6 +382,7 @@ do
 						end
 					end
 
+					v:Add(E:GetManipulateBonePosition(i))
 					local dist = hit:DistToSqr(v)
 					HovEntBones[i] = v
 					TempParentInfo[i] = E:GetBoneParent(i)
@@ -452,7 +453,7 @@ do
 				end
 			end
 
-			renderOverrideBlend(true, 1, 1, 1)
+			renderOverrideBlend(true, 3, 1, 1)
 
 			do
 				local BoneColor = BoneColor
@@ -532,8 +533,9 @@ do
 						HovBonePos = E:GetBoneMatrix(bonen):GetTranslation()
 					end
 
+					HovBonePos:Add(E:GetManipulateBonePosition(bonen))
 					local scale = epos - EyePos()
-					scale = scale:Length() * (0.3 * 0.02)
+					scale = scale:Length() * (0.25 * 0.02)
 					renderSetColorMaterialIgnoreZ()
 
 					do
@@ -546,6 +548,7 @@ do
 								pos = E:GetBoneMatrix(v):GetTranslation()
 							end
 
+							pos:Add(E:GetManipulateBonePosition(v))
 							renderDrawBeam(HovBonePos, pos, scale, 0, 1, ChildColor)
 						end
 					end
@@ -560,6 +563,7 @@ do
 								pos = E:GetBoneMatrix(parent):GetTranslation()
 							end
 
+							pos:Add(E:GetManipulateBonePosition(parent))
 							renderDrawBeam(HovBonePos, pos, scale, 0, 1, ParentColor)
 						end
 					end
