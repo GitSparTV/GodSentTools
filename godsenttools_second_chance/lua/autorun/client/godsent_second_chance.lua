@@ -29,7 +29,7 @@ do
 
 	function Think()
 		do
-			local clock = (SysTime() - start) / 1.5
+			local clock = (SysTime() - start) / 0.8
 			notificationAddProgress("Second Chance", "#godsenttools.secondchance.notification.hold", clock)
 
 			if clock > 1 then
