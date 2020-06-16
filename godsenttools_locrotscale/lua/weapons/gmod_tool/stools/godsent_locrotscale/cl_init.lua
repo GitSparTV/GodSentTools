@@ -759,7 +759,7 @@ do
 	local IN_SPEED, surfaceGetTextSize, surfaceSetFont, LocalPlayer, mathNormalizeAngle = IN_SPEED, surface.GetTextSize, surface.SetFont, LocalPlayer, math.NormalizeAngle
 
 	function TOOL:RotationThink(t)
-		local E, bone = self.TargetEntity, self.TargetBone
+		-- local E, bone = self.TargetEntity, self.TargetBone
 		local P, A = self.BonePos, self.BoneAng
 		local scale = self.EntityDistance
 
@@ -1301,7 +1301,7 @@ do
 		end)
 
 		do
-			local Properties = { }
+			local Properties = {}
 			local EntityName, EntityNameLen, PYRConvarValue = "", 0, false
 			local BoneName, BoneNameLen = "", 0
 

@@ -30,8 +30,8 @@ end
 TOOL.BoneToPhysBone = BoneToPhysBone
 
 local function SetBoneOffsets(ent, ostable, sbone)
-	local RTable = { }
-	RTable[0] = { }
+	local RTable = {}
+	RTable[0] = {}
 	RTable[0].pos = ostable[0].pos
 	RTable[0].ang = ostable[0].ang
 
@@ -54,7 +54,7 @@ local function SetBoneOffsets(ent, ostable, sbone)
 				ang = sbone.a
 			end
 
-			RTable[pb] = { }
+			RTable[pb] = {}
 			RTable[pb].pos = pos * 1
 			RTable[pb].ang = ang * 1
 		end
@@ -251,11 +251,11 @@ local function GetPhysBoneParent(ent, bone)
 end
 
 do
-	local PhysCache, PhysIDs = { }, { }
+	local PhysCache, PhysIDs = {}, {}
 
 	function TOOL:CachePhys(ent)
-		local RTable = { }
-		RTable[0] = { }
+		local RTable = {}
+		RTable[0] = {}
 		RTable[0].pos = ent:GetPhysicsObjectNum(0):GetPos()
 		RTable[0].ang = ent:GetPhysicsObjectNum(0):GetAngles()
 		RTable[0].moving = ent:GetPhysicsObjectNum(0):IsMoveable()

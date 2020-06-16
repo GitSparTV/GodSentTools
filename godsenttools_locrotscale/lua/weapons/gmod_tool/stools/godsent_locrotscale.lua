@@ -4,7 +4,7 @@ TOOL.Name = "#tool.godsent_locrotscale.name"
 TOOL.ClientConVar["propkey"] = KEY_N
 TOOL.ClientConVar["proptoggle"] = 0
 TOOL.ClientConVar["rotationpyr"] = 1
-TOOL.Information = { }
+TOOL.Information = {}
 local CheckDrag
 
 do
