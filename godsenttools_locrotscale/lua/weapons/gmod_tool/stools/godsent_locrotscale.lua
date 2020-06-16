@@ -126,18 +126,20 @@ do
 			if ent:TranslatePhysBoneToBone(phys) ~= bonen then
 				phys = -2
 			end
-			local count = ent:GetPhysicsObjectCount()
+
 			if count == 1 then
 				phys = 0
 			elseif count == 0 then
 				phys = -2
 			end
 
+			local count = ent:GetPhysicsObjectCount()
+
 			if not phys or phys == -1 then
 				error("[1] Report Spar")
 			end
 
-			if count > phys then
+			if 0 >= phys and count > phys then
 				local physobj = ent:GetPhysicsObjectNum(phys)
 
 				if physobj then
