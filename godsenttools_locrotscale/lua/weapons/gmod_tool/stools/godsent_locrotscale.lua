@@ -119,41 +119,39 @@ do
 		self.BonePos, self.BoneAng = Vector(), Angle()
 
 		if SERVER then
-			local phys = ent:TranslateBoneToPhysBone(bonen)
+			if not self:GetOwner():KeyDown(IN_WALK) then
+				local phys = self.BoneToPhysBone(ent, bonen)
+				local count = ent:GetPhysicsObjectCount()
 
-			if ent:TranslatePhysBoneToBone(phys) ~= bonen then
-				phys = -2
-			end
+				-- if count == 1 then
+				-- phys = 0
+				if count == 0 then
+					phys = -2
+				end
 
-			if count == 1 then
-				phys = 0
-			elseif count == 0 then
-				phys = -2
-			end
+				if phys == -1 then
+					error("[1] Report Spar")
+				end
 
-			local count = ent:GetPhysicsObjectCount()
+				if phys and 0 <= phys and count > phys then
+					local physobj = ent:GetPhysicsObjectNum(phys)
 
-			if not phys or phys == -1 then
-				error("[1] Report Spar")
-			end
-
-			if 0 >= phys and count > phys then
-				local physobj = ent:GetPhysicsObjectNum(phys)
-
-				if physobj then
-					self.TargetPhysBone = phys
-					self.TargetPhys = physobj
-					self.RefreshCache = true
-					self.TargetBoneMode = true
+					if physobj then
+						self.TargetPhysBone = phys
+						self.TargetPhys = physobj
+						self.RefreshCache = true
+						self.TargetBoneMode = true
+					end
 				end
 			end
-		end
 
-		if SERVER then
-			local wep = self.SWEP
-			local p = wep:GetParent()
-			wep:FollowBone(ent, 0)
-			wep:SetParent(p)
+			if not ent.LocRotScalePatched then
+				local wep = self.SWEP
+				local p = wep:GetParent()
+				wep:FollowBone(ent, 0)
+				wep:SetParent(p)
+				ent.LocRotScalePatched = true
+			end
 		end
 
 		if SERVER and gameSinglePlayer() then
