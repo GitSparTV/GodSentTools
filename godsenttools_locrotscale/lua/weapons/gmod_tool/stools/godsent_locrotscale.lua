@@ -16,11 +16,9 @@ do
 		local dist = hitpos - center
 		local distdelta = mathabs(size - dist:LengthSqr())
 		if distdelta > tolerance then return end
-
-		if SERVER then
-			debugoverlay.Cross(hitpos, 1, 10)
-		end
-
+		-- if SERVER then
+		-- 	debugoverlay.Cross(hitpos, 1, 10)
+		-- end
 		dist:Normalize()
 
 		return dist, hitpos, distdelta

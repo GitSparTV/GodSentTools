@@ -303,7 +303,7 @@ do
 
 			if pb and pb ~= 0 and parent and not RTable[pb] then
 				local obj1 = ent:GetPhysicsObjectNum(pb)
-				debugoverlay.Text(obj1:GetPos(), pb, 5)
+				-- debugoverlay.Text(obj1:GetPos(), pb, 5)
 				local obj2 = ent:GetPhysicsObjectNum(parent)
 				local pos1, ang1 = obj1:GetPos(), obj1:GetAngles()
 				local pos2, ang2 = obj2:GetPos(), obj2:GetAngles()
