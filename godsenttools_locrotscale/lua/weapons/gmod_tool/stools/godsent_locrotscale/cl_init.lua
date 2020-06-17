@@ -909,12 +909,17 @@ do
 
 		NumToColor = {
 			[0] = R,
-G, B, B, G, B
+G, B, B, R, G
 		}
-		NumTo2Color = {[3] = G, [4] = B, [5] = B}
 
+		NumTo2Color = {
+			[3] = G,
+			[4] = B,
+			[5] = R
+		}
 	end
-	local BL, Y = Color(0,0,0,200), Color(255,100,0,200)
+
+	local BL, Y = Color(0, 0, 0, 200), Color(255, 100, 0, 200)
 
 	function TOOL:DrawMoving3D(P, size)
 		-- local E = self.TargetEntity
