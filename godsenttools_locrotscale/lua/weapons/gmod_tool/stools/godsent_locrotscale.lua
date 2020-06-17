@@ -192,9 +192,9 @@ do
 			end
 
 			self:RotateEnd()
-			-- self:GetOwner():SetEyeAngles((self.RotationStart - self:GetOwner():EyePos()):Angle())
 		end
 
+		-- self:GetOwner():SetEyeAngles((self.RotationStart - self:GetOwner():EyePos()):Angle())
 		if SERVER and gameSinglePlayer() then
 			netStart("GodSentToolsLocRotScale")
 			netWriteEntity(self.SWEP)
@@ -342,9 +342,7 @@ do
 		local localized = WorldToLocal(hitpos, angle_zero, center, ang)
 		local x, y, z = localized:Unpack()
 		y, z = y * y, z * z
-		if 0 < x and x * x <= size and y <= tolerance and z <= tolerance then
-			return hitpos
-		end
+		if 0 < x and x * x <= size and y <= tolerance and z <= tolerance then return hitpos end
 	end
 
 	local function PlaneDrag(center, planeNormal, rayOrigin, rayDirection, size, tolerance)
@@ -352,11 +350,9 @@ do
 		if not hitpos then return end
 		local dist = hitpos - center
 		local mtol = -tolerance
-		local x,y,z = dist:Unpack()
-		x,y,z = x * x,y * y,z *  z
-		if x <= 1 and mtol <= y and y <= tolerance and mtol <= z and z <= tolerance then
-			return hitpos
-		end
+		local x, y, z = dist:Unpack()
+		x, y, z = x * x, y * y, z * z
+		if x <= 1 and mtol <= y and y <= tolerance and mtol <= z and z <= tolerance then return hitpos end
 	end
 
 	function TOOL:MoveTry(t)

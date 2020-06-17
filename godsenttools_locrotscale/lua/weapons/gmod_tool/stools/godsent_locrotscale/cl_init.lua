@@ -791,9 +791,11 @@ do
 	end
 
 	local PivotMin1, PivotMin2, PivotMax1, PivotMax2 = Vector(), Vector(), Vector(), Vector()
+
 	function TOOL:MovingThink(t)
 		-- local E, bone = self.TargetEntity, self.TargetBone
 		local scale = self.EntityDistance
+
 		if not self.Pressed then
 			local P, A = self.BonePos, self.BoneAng
 			local ux, uy, uz = A:Forward(), A:Right(), A:Up()
@@ -869,6 +871,7 @@ do
 			dir:Mul(16500)
 			Axis[0] = P + dir
 			Axis[1] = P + -dir
+
 			if self.MovingMode then
 				dir = self.MovingDirAngle:Right()
 				dir:Mul(16500)
@@ -988,13 +991,15 @@ G, B, B, R, G
 		else
 			local num = self.MovingDirColor
 			render.DrawBeam(Axis[0], Axis[1], Axis[-1] * 0.3, 0, 1, NumToColor[num])
+
 			if self.MovingMode then
 				render.DrawBeam(Axis[2], Axis[3], Axis[-1] * 0.3, 0, 1, NumTo2Color[num])
 			end
+
 			local originalpos = self.MovingOriginalPos
 			local ang = self.BoneAng
-				render.DrawBox(originalpos, ang, Axis[4], Axis[5], BL)
-				render.DrawBox(originalpos, ang, Axis[6], Axis[7], Y)
+			render.DrawBox(originalpos, ang, Axis[4], Axis[5], BL)
+			render.DrawBox(originalpos, ang, Axis[6], Axis[7], Y)
 		end
 	end
 
