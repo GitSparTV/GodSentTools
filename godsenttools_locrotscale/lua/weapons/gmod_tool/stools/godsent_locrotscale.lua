@@ -405,21 +405,43 @@ do
 			end
 
 			mode = true
+
 			do
 				local planetol = hscale * 0.005
-	
 				scale = (scale ^ 0.5) * 0.25
 				ux:Mul(scale)
 				uy:Mul(scale)
 				uz:Mul(scale)
+
 				do
 					local pos = (P + uy) + (P + uz)
 					pos:Div(2)
-
 					pos = PlaneDrag(pos, ux, EyePos, TraceNormal, hscale, planetol)
 
 					if pos then
 						touchdir, touchpos, touchdirang, touchcolor = ux, pos, (uz):AngleEx(ux), 3
+						goto found
+					end
+				end
+
+				do
+					local pos = (P + ux) + (P + uz)
+					pos:Div(2)
+					pos = PlaneDrag(pos, uy, EyePos, TraceNormal, hscale, planetol)
+
+					if pos then
+						touchdir, touchpos, touchdirang, touchcolor = uy, pos, (ux):AngleEx(uy), 4
+						goto found
+					end
+				end
+
+				do
+					local pos = (P + ux) + (P + uy)
+					pos:Div(2)
+					pos = PlaneDrag(pos, uz, EyePos, TraceNormal, hscale, planetol)
+
+					if pos then
+						touchdir, touchpos, touchdirang, touchcolor = uz, pos, (uy):AngleEx(uz), 5
 						goto found
 					end
 				end
@@ -428,32 +450,24 @@ do
 			-- do
 			-- 	local pos = Axis[0] + Axis[2]
 			-- 	pos:Div(2)
-
 			-- 	if PlaneDrag(pos, uy, EyePos, TraceNormal, hscale, planetol) then
 			-- 		self.MovingHoveredAxis = 4
 			-- 	end
-
 			-- 	Axis[7] = pos
 			-- end
-
 			-- Axis[8] = (uy):AngleEx(uz)
-
 			-- do
 			-- 	local pos = Axis[0] + Axis[1]
 			-- 	pos:Div(2)
-
 			-- 	if PlaneDrag(pos, uz, EyePos, TraceNormal, hscale, planetol) then
 			-- 		self.MovingHoveredAxis = 5
 			-- 	end
-
 			-- 	Axis[9] = pos
 			-- end
-
 			-- Axis[10] = (uz):AngleEx(uy)
-
 			if not touchdir then return end
 			::found::
-			self:MoveStart(touchdir, touchdirang, WorldToLocal(P,touchdirang,touchpos,touchdirang), touchcolor, mode)
+			self:MoveStart(touchdir, touchdirang, WorldToLocal(P, touchdirang, touchpos, touchdirang), touchcolor, mode)
 		end
 	end
 end
