@@ -63,8 +63,9 @@ local function HackToolguns()
 end
 
 if CLIENT then
-	language.Add("godsenttools.instrument.name", "")
+	language.Add("godsenttools.instrument.name", "Instrument")
 	language.Add("godsenttools.instrument.description", "")
+	language.Add("godsenttools.instrument.notsuperadmin", "[GodSent Tools Instrument] You must be a superadmin to use this command.")
 
 	hook.Add("PopulateToolMenu", "GodSentToolsInstrument", function()
 		spawnmenu.AddToolMenuOption("Utilities", "GodSent Tools", "GodSent_Instrument", "#godsenttools.instrument.name", "", "", function(form)
@@ -84,11 +85,11 @@ if CLIENT then
 else
 	util.AddNetworkString("GodSentToolsInstrument")
 	concommand.Add("godsenttools_instrument_hack", function(ply, cmd, args, argsStr)
-		if ply:IsValid() and not ply:IsSuperAdmin() then
+		-- if ply:IsValid() and not ply:IsSuperAdmin() then
 			ply:ChatPrint("#godsenttools.instrument.notsuperadmin")
 
-			return
-		end
+			-- return
+		-- end
 
 		HackToolguns()
 		net.Start("GodSentToolsInstrument")
