@@ -16,6 +16,7 @@ if CLIENT then
 
 	do
 		local renderFogMode = render.FogMode
+
 		local function SetupSkyboxFog(scale)
 			renderFogMode(0)
 
@@ -43,11 +44,12 @@ if CLIENT then
 			end
 		end, "GodSentToolsPitchBlack")
 	end
-
+else
 	local RemoveSun
 
 	do
 		local ipairs, entsFindByClass = ipairs, ents.FindByClass
+
 		function RemoveSun()
 			for k, v in ipairs(entsFindByClass("env_sun")) do
 				v:SetKeyValue("size", 0)
@@ -63,20 +65,23 @@ if CLIENT then
 	do
 		local Vec0 = Vector()
 		local ipairs, entsFindByClass = ipairs, ents.FindByClass
+
 		function MakeDark()
 			local Vec0 = Vec0
+
 			for k, v in ipairs(entsFindByClass("env_skypaint")) do
 				v:SetTopColor(Vec0)
 				v:SetBottomColor(Vec0)
 				v:SetFadeBias(0)
+				v:SetSunNormal(Vec0)
+				v:SetSunColor(Vec0)
+				v:SetSunSize(0)
 				v:SetDuskColor(Vec0)
 				v:SetDuskScale(0)
 				v:SetDuskIntensity(0)
 				v:SetDrawStars(false)
 				v:SetHDRScale(0)
 			end
-
-			RemoveSun()
 		end
 	end
 
@@ -85,29 +90,35 @@ if CLIENT then
 	do
 		local Vec1 = Vector(1, 1, 1)
 		local ipairs, entsFindByClass = ipairs, ents.FindByClass
+
 		function MakeWhite()
 			local Vec1 = Vec1
+
 			for k, v in ipairs(entsFindByClass("env_skypaint")) do
 				v:SetTopColor(Vec1)
 				v:SetBottomColor(Vec1)
 				v:SetFadeBias(0)
+				v:SetSunNormal(Vec1)
+				v:SetSunColor(Vec1)
+				v:SetSunSize(0)
 				v:SetDuskColor(Vec1)
 				v:SetDuskScale(0)
 				v:SetDuskIntensity(0)
 				v:SetDrawStars(false)
 				v:SetHDRScale(0)
 			end
-
-			RemoveSun()
 		end
 	end
 
 	concommand.Add("godsenttools_pitch_black_changesky", function(_, _, args)
 		_ = args[1]
+
 		if _ == "1" then
 			MakeDark()
 		elseif _ == "2" then
 			MakeWhite()
 		end
+
+		RemoveSun()
 	end, nil, "Changes the sky")
 end
