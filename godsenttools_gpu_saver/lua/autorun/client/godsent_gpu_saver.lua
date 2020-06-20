@@ -1,13 +1,16 @@
 local convar = CreateClientConVar("godsent_gpu_saver", "1", true, false, "Enables GPU Saving when the game is minimized", 0, 1)
+local convar_load = CreateClientConVar("godsent_load_notification", "1", true, false, "Enables notification when the game is loaded.", 0, 1)
 local manual = false
 local KeyboardController
 
 do
 	language.Add("godsenttools.gpusaver.name", "GPU Saver")
 	language.Add("godsenttools.gpusaver.description", "\"GPU Saver\" disables entire rendering when the game window is not focused or minimized. This helps to reduce GPU load and maybe save you from VRAM crash.")
-	language.Add("godsenttools.gpusaver.osxwarning", "Warning! MacOS detected, this addon is not working with this operation system.\nThe addon was automatically disabled.\nYou can still use \"Enable manually\".")
+	language.Add("godsenttools.gpusaver.osxwarning", "Warning! MacOS detected, this addon is not working with this operation system.\nThe addon will be automatically disabled.\nYou can still use this addon with \"Enable manually\" button.")
 	language.Add("godsenttools.gpusaver.enable.help", "Enables GPU Saver, this is required to work in automatic and manual mode.")
 	language.Add("godsenttools.gpusaver.enable.manual", "Enable manually")
+	language.Add("godsenttools.gpusaver.loadnotification.enable", "Enable \"Load Notification\"")
+	language.Add("godsenttools.gpusaver.loadnotification.enable.help", "\"Load Notification\" will inform you when the game is loaded by blinking the icon on the taskbar (Windows only) and playing a sound. Works only in windowed mode and when unfocused.")
 end
 
 hook.Add("PopulateToolMenu", "GodSentToolsGPUSaver", function()
@@ -51,6 +54,9 @@ hook.Add("PopulateToolMenu", "GodSentToolsGPUSaver", function()
 				end
 			end)
 		end
+
+		form:CheckBox("#godsenttools.gpusaver.loadnotification.enable", "godsent_load_notification")
+		form:ControlHelp("#godsenttools.gpusaver.loadnotification.enable.help")
 	end)
 end)
 
@@ -112,8 +118,6 @@ do
 		hook.Add("PreRender", "GodSentToolsGPUSaver", GPUSaver)
 	end
 
-	cvars.RemoveChangeCallback("godsent_gpu_saver", "GodSentToolsGPUSaver")
-
 	cvars.AddChangeCallback("godsent_gpu_saver", function(_, _, newValue)
 		if newValue == "1" then
 			hook.Add("PreRender", "GodSentToolsGPUSaver", GPUSaver)
@@ -121,4 +125,12 @@ do
 			hook.Remove("PreRender", "GodSentToolsGPUSaver")
 		end
 	end, "GodSentToolsGPUSaver")
+end
+
+if convar_load:GetBool() and system.IsWindowed() and (system.IsOSX() or not system.HasFocus()) then
+	hook.Add("Think", "GodSentToolsGPUSaver", function()
+		system.FlashWindow()
+		surface.PlaySound("hl1/fvox/bell.wav")
+		hook.Remove("Think", "GodSentToolsGPUSaver")
+	end)
 end
