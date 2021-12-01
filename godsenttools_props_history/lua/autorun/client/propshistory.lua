@@ -25,6 +25,10 @@ hook.Add("PopulateContent", "GodSentToolsPropsHistory", function()
 	end
 end)
 
+hook.Add("AddToolMenuCategories", "GodSentToolsCategory", function()
+	spawnmenu.AddToolCategory("Utilities", "GodSent Tools", "#godsenttools.name")
+end)
+
 hook.Add("PopulateToolMenu", "GodSentToolsPropsHistory", function()
 	spawnmenu.AddToolMenuOption("Utilities", "GodSent Tools", "GodSentTools_Props_History", "#godsenttools.propshistory.name", "", "", function(cp)
 		local list = cp:AddControl("listbox", {
