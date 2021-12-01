@@ -1,20 +1,19 @@
-local convar = CreateClientConVar("godsent_second_chance", "1", true, false, "Enables Second Chance addon.", 0, 1)
+local convar_enable = CreateClientConVar("godsenttools_second_chance", "1", true, false, "Enables Second Chance addon.", 0, 1)
+local convar_hold_time = CreateClientConVar("godsenttools_second_chance_hold_time", "0.7", true, false, "Sets hold time for GodSentTools Second Chance.", 0.1)
 
-do
-	language.Add("godsenttools.secondchance.name", "Second Chance")
-	language.Add("godsenttools.secondchance.description", "\"Second Chance\" ")
-	language.Add("godsenttools.secondchance.enable.help", "")
-	language.Add("godsenttools.secondchance.notification.hold", "Hold to unlock Undo.")
-	language.Add("godsenttools.secondchance.notification.done", "Undo is unlocked.")
-	language.Add("godsenttools.secondchance.notification.locked", "Undo is locked.")
-end
+hook.Add("AddToolMenuCategories", "GodSentToolsCategory", function()
+	spawnmenu.AddToolCategory("Utilities", "GodSent Tools", "#godsenttools.name")
+end)
 
 hook.Add("PopulateToolMenu", "GodSentToolsSecondChance", function()
 	spawnmenu.AddToolMenuOption("Utilities", "GodSent Tools", "GodSent_Second_Chance", "#godsenttools.secondchance.name", "", "", function(form)
 		form:SetName("#godsenttools.secondchance.name")
+
 		form:Help("#godsenttools.secondchance.description")
-		form:CheckBox("#godsenttools.enable", "godsent_second_chance")
-		form:ControlHelp("#godsenttools.secondchance.enable.help")
+
+		form:CheckBox("#godsenttools.enable", "godsenttools_second_chance")
+
+		form:NumSlider("#godsenttools.secondchance.holdtime", "godsenttools_second_chance_hold_time", 0.1, 5, 2)
 	end)
 end)
 
@@ -26,10 +25,16 @@ local Think
 
 do
 	local hookRemove, notificationAddProgress, SysTime, inputIsKeyDown, notificationKill = hook.Remove, notification.AddProgress, SysTime, input.IsKeyDown, notification.Kill
+	local hold_time = convar_hold_time:GetFloat()
+
+	local function ChangeHoldTime(_, _, newValue)
+		hold_time = tonumber(newValue)
+	end
+
 
 	function Think()
 		do
-			local clock = (SysTime() - start) / 0.7
+			local clock = (SysTime() - start) / hold_time
 			notificationAddProgress("Second Chance", "#godsenttools.secondchance.notification.hold", clock)
 
 			if clock > 1 then
@@ -47,6 +52,8 @@ do
 			hookRemove("Think", "GodSentToolsSecondChance", Think)
 		end
 	end
+
+	cvars.AddChangeCallback("godsenttools_second_chance_hold_time", ChangeHoldTime, "GodSentToolsSecondChance")
 end
 
 local PlayerBindPress
@@ -85,11 +92,11 @@ do
 	end
 end
 
-if convar:GetBool() then
+if convar_enable:GetBool() then
 	hook.Add("PlayerBindPress", "GodSentToolsSecondChance", PlayerBindPress)
 end
 
-cvars.AddChangeCallback("godsent_dont_move", function(_, _, newValue)
+cvars.AddChangeCallback("godsenttools_second_chance", function(_, _, newValue)
 	if newValue == "1" then
 		hook.Add("PlayerBindPress", "GodSentToolsSecondChance", PlayerBindPress)
 	else
