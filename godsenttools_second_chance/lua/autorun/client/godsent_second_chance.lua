@@ -104,3 +104,4 @@ cvars.AddChangeCallback("godsenttools_second_chance", function(_, _, newValue)
 		hook.Remove("Think", "GodSentToolsSecondChance", Think)
 	end
 end)
+
