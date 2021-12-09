@@ -127,7 +127,7 @@ do
 	end, "GodSentToolsGPUSaver")
 end
 
-if convar_load:GetBool() and system.IsWindowed() and (system.IsOSX() or not system.HasFocus()) then
+if convar_load:GetBool() then
 	hook.Add("Think", "GodSentToolsGPUSaver", function()
 		system.FlashWindow()
 		surface.PlaySound("hl1/fvox/bell.wav")
