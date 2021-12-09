@@ -1,14 +1,18 @@
 if CLIENT then
 	local convar = CreateClientConVar("godsenttools_pitch_black_fog", "0", true, false, "Disables fog", 0, 1)
+
 	language.Add("godsenttools.pitchblack.name", "Pitch Black")
 	language.Add("godsenttools.pitchblack.description", "Switch the sky in one click!")
 
 	hook.Add("PopulateToolMenu", "GodSentToolsPitchBlack", function()
 		spawnmenu.AddToolMenuOption("Utilities", "GodSent Tools", "GodSent_Pitch_Black", "#godsenttools.pitchblack.name", "", "", function(form)
 			form:SetName("#godsenttools.pitchblack.name")
+
 			form:Help("#godsenttools.pitchblack.description")
+
 			form:CheckBox("#godsenttools.pitchblack.fogtoggle", "godsenttools_pitch_black_fog")
 			form:CheckBox("#godsenttools.pitchblack.matfullbright", "mat_fullbright")
+
 			form:Button("#godsenttools.pitchblack.blacksky", "godsenttools_pitch_black_changesky", "1")
 			form:Button("#godsenttools.pitchblack.whitesky", "godsenttools_pitch_black_changesky", "2")
 		end)
@@ -17,30 +21,24 @@ if CLIENT then
 	do
 		local renderFogMode = render.FogMode
 
-		local function SetupSkyboxFog(scale)
-			renderFogMode(0)
-
-			return true
-		end
-
-		local function SetupWorldFog()
+		local function HookOverride(scale)
 			renderFogMode(0)
 
 			return true
 		end
 
 		if convar:GetBool() then
-			hook.Add("SetupSkyboxFog", "GodSentToolsPitchBlack", SetupSkyboxFog)
-			hook.Add("SetupWorldFog", "GodSentToolsPitchBlack", SetupWorldFog)
+			hook.Add("SetupSkyboxFog", "GodSentToolsPitchBlack", HookOverride)
+			hook.Add("SetupWorldFog", "GodSentToolsPitchBlack", HookOverride)
 		end
 
 		cvars.AddChangeCallback("godsenttools_pitch_black_fog", function(_, _, newValue)
 			if newValue == "1" then
-				hook.Add("SetupSkyboxFog", "GodSentToolsPitchBlack", SetupSkyboxFog)
-				hook.Add("SetupWorldFog", "GodSentToolsPitchBlack", SetupWorldFog)
+				hook.Add("SetupSkyboxFog", "GodSentToolsPitchBlack", HookOverride)
+				hook.Add("SetupWorldFog", "GodSentToolsPitchBlack", HookOverride)
 			else
-				hook.Remove("SetupSkyboxFog", "GodSentToolsPitchBlack", SetupSkyboxFog)
-				hook.Remove("SetupWorldFog", "GodSentToolsPitchBlack", SetupWorldFog)
+				hook.Remove("SetupSkyboxFog", "GodSentToolsPitchBlack")
+				hook.Remove("SetupWorldFog", "GodSentToolsPitchBlack")
 			end
 		end, "GodSentToolsPitchBlack")
 	end
