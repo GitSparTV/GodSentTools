@@ -60,8 +60,9 @@ end
 local cv = CreateClientConVar("godsenttools_gallery_dateformat", "%d/%m/%y", true, false, "Date format in Gallery tab")
 
 spawnmenu.AddCreationTab("#godsenttools.gallery.name", function()
-	local panel = vgui.Create("DScrollPanel")
+	local panel = vgui.Create("DPanel")
 	panel:Dock(FILL)
+	panel.Paint = nil
 
 	local bar = panel:Add("DPanel")
 	bar:Dock(TOP)
@@ -75,19 +76,82 @@ spawnmenu.AddCreationTab("#godsenttools.gallery.name", function()
 	label.m_DragSlot = nil
 
 	local refresh = bar:Add("DButton")
-	refresh:SetText("#godsenttools.gallery.refresh")
-	refresh:SetIcon("icon16/arrow_refresh.png")
+	refresh:SetTooltip("#godsenttools.gallery.refresh")
 	refresh:Dock(RIGHT)
-	refresh:SetFont("DermaLarge")
-	refresh:SizeToContentsX(42)
-	refresh:SetContentAlignment(5)
+	refresh:SetSize(64 - 10, 64)
+	refresh:DockMargin(5, 5, 0, 5)
+	refresh:SetText("")
+
+	do
+		local refresh_image = refresh:Add("DImage")
+		refresh_image:SetImage("icon16/arrow_refresh.png")
+		refresh_image:Dock(FILL)
+		refresh_image:DockMargin(10, 10, 10, 10)
+	end
+
 	refresh.label = label
 	refresh.next_reload = SysTime()
 
-	local layout = panel:Add("DIconLayout")
+	local page_select_forward = bar:Add("DButton")
+	page_select_forward:SetTooltip("#godsenttools.gallery.nextpage")
+	page_select_forward:Dock(RIGHT)
+	page_select_forward:SetSize(64 - 10, 64)
+	page_select_forward:DockMargin(5, 5, 5, 5)
+	page_select_forward:SetEnabled(false)
+	page_select_forward.refresh = refresh
+
+	do
+		local page_select_forward_image = page_select_forward:Add("DImage")
+		page_select_forward_image:SetImage("icon16/arrow_right.png")
+		page_select_forward_image:Dock(FILL)
+		page_select_forward_image:DockMargin(10, 10, 10, 10)
+	end
+
+	function page_select_forward:DoClick()
+		self.refresh:DoClick(self.refresh.current_offset + 1)
+	end
+
+	local page_select_back = bar:Add("DButton")
+	page_select_back:SetTooltip("#godsenttools.gallery.previouspage")
+	page_select_back:Dock(RIGHT)
+	page_select_back:SetSize(64 - 10, 64)
+	page_select_back:DockMargin(5, 5, 5, 5)
+	page_select_back:SetEnabled(false)
+	page_select_back.refresh = refresh
+
+	do
+		local page_select_back_image = page_select_back:Add("DImage")
+		page_select_back_image:SetImage("icon16/arrow_left.png")
+		page_select_back_image:Dock(FILL)
+		page_select_back_image:DockMargin(10, 10, 10, 10)
+	end
+
+	function page_select_back:DoClick()
+		self.refresh:DoClick(self.refresh.current_offset - 1)
+	end
+
+	local page_select_number = bar:Add("ContentHeader")
+	page_select_number:SetText("1 / 1")
+	page_select_number:Dock(RIGHT)
+	page_select_number:DockMargin(0, 0, -16, 0)
+
+	function page_select_number:ChangeText(page, total)
+		self:SetText(page .. " / " .. total)
+	end
+
+	refresh.back_button = page_select_back
+	refresh.forward_button = page_select_forward
+	refresh.page_text = page_select_number
+
+	local scroll_panel = panel:Add("DScrollPanel")
+	scroll_panel:Dock(FILL)
+	refresh.scroll_panel = scroll_panel
+
+	local layout = scroll_panel:Add("DIconLayout")
 	layout:Dock(FILL)
 	layout:SetSpaceY(5)
 	layout:SetSpaceX(5)
+	refresh.layout = layout
 
 	function refresh:Think()
 		local cur = SysTime()
@@ -101,13 +165,23 @@ spawnmenu.AddCreationTab("#godsenttools.gallery.name", function()
 		self:DoClick()
 	end
 
-	function refresh:DoClick()
+	function refresh:DoClick(offset)
 		layout:Clear()
+
 		local scr = file.Find("screenshots/*", "GAME", "datedesc")
+		local total = #scr
+
 		local last
 		local k = 0
 
-		for i = 1, #scr do
+		local max_page = math.ceil(total / 5)
+		offset = math.min(max_page, offset or 1)
+		self.current_offset = offset
+
+		print((offset - 1) * 5 + 1, math.min(total, offset * 5))
+
+		for i = (offset - 1) * 5 + 1, math.min(total, offset * 5) do
+
 			local v = scr[i]
 
 			local ext = string.match(v, "%.([^.]+)$")
@@ -147,7 +221,13 @@ spawnmenu.AddCreationTab("#godsenttools.gallery.name", function()
 			end
 		end
 
+		self.back_button:SetEnabled(offset ~= 1)
+		self.forward_button:SetEnabled(offset ~= max_page)
+		self.page_text:ChangeText(offset, max_page)
+
 		self.label:SetText(language.GetPhrase("#godsenttools.gallery.name") .. " (" .. k .. " " .. language.GetPhrase("#godsenttools.gallery.screenshots") .. ")")
+		
+		scroll_panel.VBar:SetScroll(0)
 	end
 
 	local function ConVarRefresh()
