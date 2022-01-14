@@ -91,7 +91,7 @@ do
 				end
 
 				::close::
-				hook.Remove("PostRenderVGUI", "GodSentToolsGraphicsProfile")
+				hook.Remove("PreRender", "GodSentToolsGraphicsProfile")
 			end
 
 			function apply:DoClick()
@@ -110,7 +110,7 @@ do
 				len, h = len / 2, h / 2
 
 				hook.Add("PreRender", "GodSentToolsGraphicsProfile", function()
-					cam.Start(t2D)
+					cam.Start2D()
 
 					render.Clear(0,0,0,0)
 					surface.SetFont("DermaLarge")
@@ -135,6 +135,7 @@ do
 
 					if SysTime() - start > 2 then
 						current, total, command = worker(self.file)
+						start = SysTime() - 1.5
 					end
 
 					return true
