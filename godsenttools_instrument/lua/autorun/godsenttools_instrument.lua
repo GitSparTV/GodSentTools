@@ -68,7 +68,7 @@ if CLIENT then
 	language.Add("godsenttools.instrument.notsuperadmin", "[GodSent Tools Instrument] You must be a superadmin to use this command.")
 
 	hook.Add("PopulateToolMenu", "GodSentToolsInstrument", function()
-		spawnmenu.AddToolMenuOption("Utilities", "GodSent Tools", "GodSent_Instrument", "#godsenttools.instrument.name", "", "", function(form)
+		spawnmenu.AddToolMenuOption("Utilities", "#godsenttools.name", "GodSent_Instrument", "#godsenttools.instrument.name", "", "", function(form)
 			form:SetName("#godsenttools.instrument.name")
 			form:Help("#godsenttools.instrument.description")
 			form:Button("#godsenttools.instrument.hackon", "godsenttools_instrument_hack", "1")

@@ -16,12 +16,13 @@ hook.Add("PopulateToolMenu", "GodSentToolsGPUSaver", function()
 		KeyboardController:SetMouseInputEnabled(false)
 	end
 
-	spawnmenu.AddToolMenuOption("Utilities", "GodSent Tools", "GodSentTools_GPU_Saver", "#godsenttools.gpusaver.name", "", "", function(form)
+	spawnmenu.AddToolMenuOption("Utilities", "#godsenttools.name", "GodSentTools_GPU_Saver", "#godsenttools.gpusaver.name", "", "", function(form)
 		form:SetName("#godsenttools.gpusaver.name")
 		form:Help("#godsenttools.gpusaver.description")
 
 		if system.IsOSX() then
 			form:Help("#godsenttools.gpusaver.osxwarning")
+
 			convar:SetBool(false)
 		end
 
@@ -34,11 +35,13 @@ hook.Add("PopulateToolMenu", "GodSentToolsGPUSaver", function()
 
 			hook.Add("PostRenderVGUI", "GodSentToolsGPUSaver", function()
 				local anim = (RealTime() - start) * 1.5
+
 				surface.SetDrawColor(0, 130, 255, anim * 255)
 				surface.DrawRect(0, 0, ScrW(), ScrH())
 
 				if anim > 1.2 then
 					manual = true
+
 					hook.Remove("PostRenderVGUI", "GodSentToolsGPUSaver")
 				end
 			end)
@@ -48,15 +51,20 @@ end)
 
 do
 	surface.SetFont("DermaLarge")
-	local Line1len = surface.GetTextSize("GPU Saver is enabled.") * 0.5
-	local Line2len, Line2h = surface.GetTextSize("Press any key to disable manually.")
+
+	local Line1len = surface.GetTextSize("#godsenttools.gpusaver.screen.enabled") * 0.5
+	
+	local Line2len, Line2h = surface.GetTextSize("#godsenttools.gpusaver.screen.presskey")
 	Line2len = Line2len * 0.5
+
 	local Line2h2, Line2h02, Line2h15 = Line2h * 2, Line2h * 0.5, Line2h * 1.5
-	local Line3len = surface.GetTextSize("To disable this entirely go to:") * 0.5
-	local Line4len = surface.GetTextSize("Q > Utilities > GodSent Tools > GPU Saver.") * 0.5
+	local Line3len = surface.GetTextSize("#godsenttools.gpusaver.screen.howtodisable") * 0.5
+	local Line4len = surface.GetTextSize("#godsenttools.gpusaver.screen.wheretodisable") * 0.5
+	
 	local surfaceSetTextColor, systemHasFocus, camStart, surfaceSetTextPos, surfaceSetFont, camEnd2D, surfaceDrawText = surface.SetTextColor, system.HasFocus, cam.Start, surface.SetTextPos, surface.SetFont, cam.End2D, surface.DrawText
 	local surfaceSetDrawColor, surfaceDrawRect = surface.SetDrawColor, surface.DrawRect
 	local ScrW, ScrH = ScrW, ScrH
+	
 	local state = false
 
 	local t2D = {
@@ -74,19 +82,27 @@ do
 			end
 
 			local W, H = ScrW() * 0.5, ScrH() * 0.5
+
 			camStart(t2D)
+
 			surfaceSetDrawColor(0, 130, 255)
 			surfaceDrawRect(0, 0, W * 2, H * 2)
+
 			surfaceSetFont("DermaLarge")
 			surfaceSetTextColor(255, 255, 255)
+
 			surfaceSetTextPos(W - Line1len, H - Line2h2)
-			surfaceDrawText("GPU Saver is enabled.")
+			surfaceDrawText("#godsenttools.gpusaver.screen.enabled")
+
 			surfaceSetTextPos(W - Line2len, H - Line2h02)
-			surfaceDrawText("Press any key to disable manually.")
+			surfaceDrawText("#godsenttools.gpusaver.screen.presskey")
+
 			surfaceSetTextPos(W - Line3len, H + Line2h02)
-			surfaceDrawText("To disable this entirely go to:")
+			surfaceDrawText("#godsenttools.gpusaver.screen.howtodisable")
+			
 			surfaceSetTextPos(W - Line4len, H + Line2h15)
-			surfaceDrawText("Q > Utilities > GodSent Tools > GPU Saver.")
+			surfaceDrawText("#godsenttools.gpusaver.screen.wheretodisable")
+
 			camEnd2D()
 
 			return true

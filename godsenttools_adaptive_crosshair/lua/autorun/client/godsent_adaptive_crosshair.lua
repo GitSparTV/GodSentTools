@@ -1,9 +1,9 @@
-
 do
 	local surfaceDrawLine, ScrW, ScrH, renderOverrideBlend, surfaceSetDrawColor = surface.DrawLine, ScrW, ScrH, render.OverrideBlend, surface.SetDrawColor
 
 	hook.Add("PostDrawHUD","GodSentToolsAdaptiveCrosshair",function()
 		if not hook.Run("HUDShouldDraw","CHudGMod") then return end
+
 		renderOverrideBlend(true, 3, 1, 1)
 		surfaceSetDrawColor(255, 255, 255)
 
