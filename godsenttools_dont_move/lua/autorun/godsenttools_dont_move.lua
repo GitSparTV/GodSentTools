@@ -1,16 +1,10 @@
-local convar = CreateConVar("godsenttools_dont_move", "0", bit.band(SERVER and FCVAR_ARCHIVE or 0, FCVAR_NOTIFY, FCVAR_REPLICATED), "If enabled, all objects will not move.", 0, 1)
+local convar = CreateConVar("godsenttools_dont_move", "0", bit.band(SERVER and FCVAR_ARCHIVE or 0, FCVAR_NOTIFY, FCVAR_REPLICATED), language and language.GetPhrase("#godsenttools.dontmove.enable.help") or "If enabled, all objects will not move.", 0, 1)
 
 if CLIENT then
-	do
-		language.Add("godsenttools.dontmove.name", "Don't Move")
-		language.Add("godsenttools.dontmove.description", "\"Don't Move\" disables all movements of all objects, this will prevent from accidental physgun drops. This also disabled unfreezing (Reload button).")
-		language.Add("godsenttools.dontmove.enable.help", "If enabled, all objects will not move.")
-	end
-
 	hook.Add("PopulateToolMenu", "GodSentToolsDontMove", function()
 		spawnmenu.AddToolMenuOption("Utilities", "#godsenttools.name", "GodSentTools_Dont_Move", "#godsenttools.dontmove.name", "", "", function(form)
 			form:SetName("#godsenttools.dontmove.name")
-			form:Help("#godsenttools.dontmove.description")
+			form:Help(string.format(language.GetPhrase("#godsenttools.dontmove.description"), string.upper(input.LookupBinding("+reload"))))
 			form:CheckBox("#godsenttools.enable", "godsenttools_dont_move")
 			form:ControlHelp("#godsenttools.dontmove.enable.help")
 		end)
