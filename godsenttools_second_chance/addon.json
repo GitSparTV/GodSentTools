@@ -1,6 +1,0 @@
-{
-	"title"		:	"GodSentTools Second Chance",
-	"type"		:	"tool",
-	"tags"		:	[ "build", "scenic" ],
-	"ignore"	:	[ "icon.jpg" ]
-}
