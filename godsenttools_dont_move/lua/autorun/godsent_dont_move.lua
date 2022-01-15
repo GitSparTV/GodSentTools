@@ -8,7 +8,7 @@ if CLIENT then
 	end
 
 	hook.Add("PopulateToolMenu", "GodSentToolsDontMove", function()
-		spawnmenu.AddToolMenuOption("Utilities", "GodSent Tools", "GodSent_Dont_Move", "#godsenttools.dontmove.name", "", "", function(form)
+		spawnmenu.AddToolMenuOption("Utilities", "#godsenttools.name", "GodSent_Dont_Move", "#godsenttools.dontmove.name", "", "", function(form)
 			form:SetName("#godsenttools.dontmove.name")
 			form:Help("#godsenttools.dontmove.description")
 			form:CheckBox("#godsenttools.enable", "godsent_dont_move")

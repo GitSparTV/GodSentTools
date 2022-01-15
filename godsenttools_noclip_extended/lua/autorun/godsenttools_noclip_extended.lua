@@ -1,7 +1,7 @@
 do
 	local FrameTime = FrameTime
 
-	hook.Add("Move", "NoclipExtended", function(ply, mv)
+	hook.Add("Move", "GodSendToolsNoclipExtended", function(ply, mv)
 		if ply:GetMoveType() ~= 8 then return end -- MOVETYPE_NOCLIP
 
 		ply:ViewPunchReset()

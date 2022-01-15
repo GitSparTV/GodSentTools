@@ -5,7 +5,7 @@ if CLIENT then
 	language.Add("godsenttools.pitchblack.description", "Switch the sky in one click!")
 
 	hook.Add("PopulateToolMenu", "GodSentToolsPitchBlack", function()
-		spawnmenu.AddToolMenuOption("Utilities", "GodSent Tools", "GodSent_Pitch_Black", "#godsenttools.pitchblack.name", "", "", function(form)
+		spawnmenu.AddToolMenuOption("Utilities", "#godsenttools.name", "GodSent_Pitch_Black", "#godsenttools.pitchblack.name", "", "", function(form)
 			form:SetName("#godsenttools.pitchblack.name")
 
 			form:Help("#godsenttools.pitchblack.description")

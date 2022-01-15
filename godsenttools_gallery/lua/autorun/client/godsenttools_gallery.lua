@@ -1,9 +1,5 @@
-hook.Add("AddToolMenuCategories", "GodSentToolsCategory", function()
-	spawnmenu.AddToolCategory("Utilities", "GodSent Tools", "#godsenttools.name")
-end)
-
 hook.Add("PopulateToolMenu", "GodSentToolsGallery", function()
-	spawnmenu.AddToolMenuOption("Utilities", "GodSent Tools", "GodSentTools_Gallery", "#godsenttools.gallery.name", "", "", function(cp)
+	spawnmenu.AddToolMenuOption("Utilities", "#godsenttools.name", "GodSentTools_Gallery", "#godsenttools.gallery.name", "", "", function(cp)
 		local list = cp:AddControl("listbox", {
 			Label = "#godsenttools.gallery.dateformat"
 		})
@@ -177,8 +173,6 @@ spawnmenu.AddCreationTab("#godsenttools.gallery.name", function()
 		local max_page = math.ceil(total / 5)
 		offset = math.min(max_page, offset or 1)
 		self.current_offset = offset
-
-		print((offset - 1) * 5 + 1, math.min(total, offset * 5))
 
 		for i = (offset - 1) * 5 + 1, math.min(total, offset * 5) do
 

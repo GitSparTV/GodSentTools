@@ -6,7 +6,7 @@ do
 	end
 
 	file.CreateDir("godsenttools_graphicsprofile")
-	print(file.Exists("godsenttools_graphicsprofile/ultra.dat", "DATA"))
+
 	if not file.Exists("godsenttools_graphicsprofile/ultra.dat", "DATA") then
 		file.Write("godsenttools_graphicsprofile/ultra.dat", util.Decompress(util.Base64Decode("XQAAAQAFAgAAAAAAAAAX4HygbzfQznvDfOTUp0xLM5RSHHtaSkt+gKPCM0JwZ53mEGUDJH3u8jPEn+6rU15hvgR/nUoxyesGocfBmj8C2hjX61PldkoppwIbzB0iebb1SZtTpOb5wJALDkF54GdNRN6A3gASeiPeoMOENgWVeWoPE+KeIKWEKgUEhce4ZgFRrpDxGVcH/WEuLiVPKn5GvtW29+DRyOoeBOhh92iF7xr69JOELIZSK43uk0rli3zeba4VBOqT8Kp4L/rKo8KVCQE9qlrjPK5GThW8myXVSHAB9gOqhNrNwvrm3TxSVg1Xl8GcQEC+oxeo3c1d4XX6s8D6Hq39gW1T5QgOyCwnQfRIovjmiVa28vMSvwzh1G13w+vZ4Tz7V/YDgoRYt4POi9BZqw==")))
 	end
@@ -16,7 +16,7 @@ do
 	end
 
 	hook.Add("PopulateToolMenu", "GodSentToolsGraphicsProfile", function()
-		spawnmenu.AddToolMenuOption("Utilities", "GodSent Tools", "GodSent_Graphics_Profile", "#godsenttools.graphicsprofile.name", "", "", function(form)
+		spawnmenu.AddToolMenuOption("Utilities", "#godsenttools.name", "GodSent_Graphics_Profile", "#godsenttools.graphicsprofile.name", "", "", function(form)
 			form:SetName("#godsenttools.graphicsprofile.name")
 			form:Help("#godsenttools.graphicsprofile.description")
 			local reload = vgui.Create("DButton")
@@ -91,7 +91,7 @@ do
 				end
 
 				::close::
-				hook.Remove("PostRenderVGUI", "GodSentToolsGraphicsProfile")
+				hook.Remove("PreRender", "GodSentToolsGraphicsProfile")
 			end
 
 			function apply:DoClick()
@@ -109,13 +109,17 @@ do
 				local current, total, command = 0, 1
 				len, h = len / 2, h / 2
 
-				hook.Add("PostRenderVGUI", "GodSentToolsGraphicsProfile", function()
+				hook.Add("PreRender", "GodSentToolsGraphicsProfile", function()
+					cam.Start2D()
+
 					render.Clear(0,0,0,0)
 					surface.SetFont("DermaLarge")
 					surface.SetTextColor(255, 255, 255)
 					surface.SetTextPos(ScrW() / 2 - len, ScrH() / 2 - h)
 					surface.DrawText(text)
-					surface.SetDrawColor(100, 100, 100)
+
+					local wave = math.sin(RealTime() * 5) * 50
+					surface.SetDrawColor(100 + wave, 100 + wave, 100 + wave)
 					surface.DrawRect(ScrW() / 2 - 200, ScrH() / 2 + h + 20, 400, 20)
 					surface.SetDrawColor(255, 255, 255)
 					surface.DrawRect(ScrW() / 2 - 200, ScrH() / 2 + h + 20, (current / total) * 400, 20)
@@ -127,9 +131,14 @@ do
 						surface.DrawText(t)
 					end
 
+					cam.End2D()
+
 					if SysTime() - start > 2 then
 						current, total, command = worker(self.file)
+						start = SysTime() - 1.5
 					end
+
+					return true
 				end)
 			end
 
