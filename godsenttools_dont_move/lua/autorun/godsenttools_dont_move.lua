@@ -4,7 +4,7 @@ if CLIENT then
 	hook.Add("PopulateToolMenu", "GodSentToolsDontMove", function()
 		spawnmenu.AddToolMenuOption("Utilities", "#godsenttools.name", "GodSentTools_Dont_Move", "#godsenttools.dontmove.name", "", "", function(form)
 			form:SetName("#godsenttools.dontmove.name")
-			form:Help(string.format(language.GetPhrase("#godsenttools.dontmove.description"), string.upper(input.LookupBinding("+reload"))))
+			form:Help(string.format(language.GetPhrase("#godsenttools.dontmove.description"), string.upper(input.LookupBinding("reload") or "R")))
 			form:CheckBox("#godsenttools.enable", "godsenttools_dont_move")
 			form:ControlHelp("#godsenttools.dontmove.enable.help")
 		end)
