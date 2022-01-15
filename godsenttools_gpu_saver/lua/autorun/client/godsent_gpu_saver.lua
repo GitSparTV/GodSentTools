@@ -1,4 +1,4 @@
-local convar = CreateClientConVar("godsenttools_gpu_saver", "1", true, false, "Enables GPU Saver, this is required to work in automatic and manual mode", 0, 1)
+local convar = CreateClientConVar("godsenttools_gpu_saver", "1", true, false, language.GetPhrase("#godsenttools.gpusaver.enable.help"), 0, 1)
 local manual = false
 local KeyboardController = NULL
 
