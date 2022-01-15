@@ -1,4 +1,4 @@
-local convar = CreateConVar("godsent_dont_move", "0", bit.band(SERVER and FCVAR_ARCHIVE or 0, FCVAR_NOTIFY, FCVAR_REPLICATED), "If enabled, all objects will not move.", 0, 1)
+local convar = CreateConVar("godsenttools_dont_move", "0", bit.band(SERVER and FCVAR_ARCHIVE or 0, FCVAR_NOTIFY, FCVAR_REPLICATED), "If enabled, all objects will not move.", 0, 1)
 
 if CLIENT then
 	do
@@ -8,10 +8,10 @@ if CLIENT then
 	end
 
 	hook.Add("PopulateToolMenu", "GodSentToolsDontMove", function()
-		spawnmenu.AddToolMenuOption("Utilities", "#godsenttools.name", "GodSent_Dont_Move", "#godsenttools.dontmove.name", "", "", function(form)
+		spawnmenu.AddToolMenuOption("Utilities", "#godsenttools.name", "GodSentTools_Dont_Move", "#godsenttools.dontmove.name", "", "", function(form)
 			form:SetName("#godsenttools.dontmove.name")
 			form:Help("#godsenttools.dontmove.description")
-			form:CheckBox("#godsenttools.enable", "godsent_dont_move")
+			form:CheckBox("#godsenttools.enable", "godsenttools_dont_move")
 			form:ControlHelp("#godsenttools.dontmove.enable.help")
 		end)
 	end)
@@ -70,7 +70,7 @@ else
 		ApplyToAll()
 	end
 
-	cvars.AddChangeCallback("godsent_dont_move", function(_, _, newValue)
+	cvars.AddChangeCallback("godsenttools_dont_move", function(_, _, newValue)
 		if newValue == "1" then
 			ApplyToAll()
 			hook.Add("OnEntityCreated", "GodSentToolsDontMove", OnEntityCreated)

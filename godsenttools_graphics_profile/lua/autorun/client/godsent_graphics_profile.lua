@@ -16,7 +16,7 @@ do
 	end
 
 	hook.Add("PopulateToolMenu", "GodSentToolsGraphicsProfile", function()
-		spawnmenu.AddToolMenuOption("Utilities", "#godsenttools.name", "GodSent_Graphics_Profile", "#godsenttools.graphicsprofile.name", "", "", function(form)
+		spawnmenu.AddToolMenuOption("Utilities", "#godsenttools.name", "GodSentTools_Graphics_Profile", "#godsenttools.graphicsprofile.name", "", "", function(form)
 			form:SetName("#godsenttools.graphicsprofile.name")
 			form:Help("#godsenttools.graphicsprofile.description")
 			local reload = vgui.Create("DButton")

@@ -5,7 +5,7 @@ local bind_key_name = string.upper(input.LookupBinding("gmod_undo"))
 local bind_key_code = input.GetKeyCode(input.LookupBinding("gmod_undo"))
 
 hook.Add("PopulateToolMenu", "GodSentToolsSecondChance", function()
-	spawnmenu.AddToolMenuOption("Utilities", "#godsenttools.name", "GodSent_Second_Chance", "#godsenttools.secondchance.name", "", "", function(form)
+	spawnmenu.AddToolMenuOption("Utilities", "#godsenttools.name", "GodSentTools_Second_Chance", "#godsenttools.secondchance.name", "", "", function(form)
 		form:SetName("#godsenttools.secondchance.name")
 		form:Help(string.format(language.GetPhrase("#godsenttools.secondchance.description"), bind_key_name))
 
