@@ -53,7 +53,7 @@ local function OpenScreenshot(self)
 	frame:MakePopup()
 end
 
-local cv = CreateClientConVar("godsenttools_gallery_dateformat", "%d/%m/%y", true, false, "Date format in Gallery tab")
+local cv = CreateClientConVar("godsenttools_gallery_dateformat", "%d/%m/%y", true, false, language.GetPhrase("#godsenttools.gallery.convar.dateformat"))
 
 spawnmenu.AddCreationTab("#godsenttools.gallery.name", function()
 	local panel = vgui.Create("DPanel")
