@@ -78,9 +78,9 @@ end
 local function HackToolguns()
 	local wep = weapons.GetStored("gmod_tool")
 
-	-- if wep.GodSentToolsInstrumentHacked then
-		-- return
-	-- end
+	if wep.GodSentToolsInstrumentHacked then
+		return
+	end
 
 	for k, v in pairs(HackMeta) do
 		Backup[k] = wep[k]
@@ -149,7 +149,7 @@ if CLIENT then
 	language.Add("godsenttools.instrument.description", "description")
 	language.Add("godsenttools.instrument.hackon", "On")
 	language.Add("godsenttools.instrument.hackoff", "Off")
-	language.Add("godsenttools.instrument.notsuperadmin", "[GodSent Tools Instrument] You must be a superadmin to use this command.")
+	language.Add("godsenttools.instrument.notsuperadmin", "[GodSentTools Instrument] You must be a superadmin to use this command.")
 
 	hook.Add("PopulateToolMenu", "GodSentToolsInstrument", function()
 		spawnmenu.AddToolMenuOption("Utilities", "#godsenttools.name", "GodSentTools_Instrument", "#godsenttools.instrument.name", "", "", function(form)
