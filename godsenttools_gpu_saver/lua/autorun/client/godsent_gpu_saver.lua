@@ -12,6 +12,7 @@ hook.Add("PopulateToolMenu", "GodSentToolsGPUSaver", function()
 
 	function KeyboardController:OnKeyCodeReleased(keyCode)
 		manual = false
+
 		KeyboardController:SetKeyboardInputEnabled(false)
 		KeyboardController:SetMouseInputEnabled(false)
 	end
@@ -53,18 +54,20 @@ do
 	surface.SetFont("DermaLarge")
 
 	local Line1len = surface.GetTextSize("#godsenttools.gpusaver.screen.enabled") * 0.5
-	
+
 	local Line2len, Line2h = surface.GetTextSize("#godsenttools.gpusaver.screen.presskey")
 	Line2len = Line2len * 0.5
 
 	local Line2h2, Line2h02, Line2h15 = Line2h * 2, Line2h * 0.5, Line2h * 1.5
 	local Line3len = surface.GetTextSize("#godsenttools.gpusaver.screen.howtodisable") * 0.5
-	local Line4len = surface.GetTextSize("#godsenttools.gpusaver.screen.wheretodisable") * 0.5
-	
+
+	local where_to_disable = string.format(language.GetPhrase("#godsenttools.gpusaver.screen.wheretodisable"), string.upper(input.LookupBinding("+menu")))
+	local Line4len = surface.GetTextSize(where_to_disable) * 0.5
+
 	local surfaceSetTextColor, systemHasFocus, camStart, surfaceSetTextPos, surfaceSetFont, camEnd2D, surfaceDrawText = surface.SetTextColor, system.HasFocus, cam.Start, surface.SetTextPos, surface.SetFont, cam.End2D, surface.DrawText
 	local surfaceSetDrawColor, surfaceDrawRect = surface.SetDrawColor, surface.DrawRect
 	local ScrW, ScrH = ScrW, ScrH
-	
+
 	local state = false
 
 	local t2D = {
@@ -99,9 +102,9 @@ do
 
 			surfaceSetTextPos(W - Line3len, H + Line2h02)
 			surfaceDrawText("#godsenttools.gpusaver.screen.howtodisable")
-			
+
 			surfaceSetTextPos(W - Line4len, H + Line2h15)
-			surfaceDrawText("#godsenttools.gpusaver.screen.wheretodisable")
+			surfaceDrawText(where_to_disable)
 
 			camEnd2D()
 
