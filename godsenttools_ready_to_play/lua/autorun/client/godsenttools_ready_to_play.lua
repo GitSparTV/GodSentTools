@@ -1,7 +1,7 @@
-local convar = CreateClientConVar("godsenttools_ready_to_play", "1", true, false, "Enables Ready To Play.", 0, 1)
+local convar = CreateClientConVar("godsenttools_ready_to_play", "1", true, false, language.GetPhrase("#godsenttools.readytoplay.enable.help"), 0, 1)
 
 hook.Add("PopulateToolMenu", "GodSentToolsReadyToPlay", function()
-	spawnmenu.AddToolMenuOption("Utilities", "#godsenttools.name", "GodSent_Ready_To_Play", "#godsenttools.readytoplay.name", "", "", function(form)
+	spawnmenu.AddToolMenuOption("Utilities", "#godsenttools.name", "GodSentTools_Ready_To_Play", "#godsenttools.readytoplay.name", "", "", function(form)
 		form:SetName("#godsenttools.readytoplay.name")
 		form:Help("#godsenttools.readytoplay.description")
 

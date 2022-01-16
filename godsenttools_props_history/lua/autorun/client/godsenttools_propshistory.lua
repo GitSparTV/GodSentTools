@@ -59,7 +59,7 @@ local t = {
 }
 
 do
-	local cv = CreateClientConVar("godsenttools_propshistory_size", "64x64", true, false, "Sets icons size")
+	local cv = CreateClientConVar("godsenttools_propshistory_size", "64x64", true, false, language.GetPhrase("#godsenttools.propshistory.convar.size"))
 	local tonumber, stringmatch = tonumber, string.match
 
 	local function SetIconSize(_, _, val)

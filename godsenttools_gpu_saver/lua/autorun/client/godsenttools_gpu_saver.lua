@@ -61,7 +61,7 @@ do
 	local Line2h2, Line2h02, Line2h15 = Line2h * 2, Line2h * 0.5, Line2h * 1.5
 	local Line3len = surface.GetTextSize("#godsenttools.gpusaver.screen.howtodisable") * 0.5
 
-	local where_to_disable = string.format(language.GetPhrase("#godsenttools.gpusaver.screen.wheretodisable"), string.upper(input.LookupBinding("+menu")))
+	local where_to_disable = string.format(language.GetPhrase("#godsenttools.gpusaver.screen.wheretodisable"), string.upper(input.LookupBinding("menu") or "Q"))
 	local Line4len = surface.GetTextSize(where_to_disable) * 0.5
 
 	local surfaceSetTextColor, systemHasFocus, camStart, surfaceSetTextPos, surfaceSetFont, camEnd2D, surfaceDrawText = surface.SetTextColor, system.HasFocus, cam.Start, surface.SetTextPos, surface.SetFont, cam.End2D, surface.DrawText

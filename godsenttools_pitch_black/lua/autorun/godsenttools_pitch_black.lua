@@ -1,11 +1,8 @@
 if CLIENT then
-	local convar = CreateClientConVar("godsenttools_pitch_black_fog", "0", true, false, "Disables fog", 0, 1)
-
-	language.Add("godsenttools.pitchblack.name", "Pitch Black")
-	language.Add("godsenttools.pitchblack.description", "Switch the sky in one click!")
+	local convar = CreateClientConVar("godsenttools_pitch_black_fog", "0", true, false, language.GetPhrase("#godsenttools.pitchblack.fogtoggle"), 0, 1)
 
 	hook.Add("PopulateToolMenu", "GodSentToolsPitchBlack", function()
-		spawnmenu.AddToolMenuOption("Utilities", "#godsenttools.name", "GodSent_Pitch_Black", "#godsenttools.pitchblack.name", "", "", function(form)
+		spawnmenu.AddToolMenuOption("Utilities", "#godsenttools.name", "GodSentTools_Pitch_Black", "#godsenttools.pitchblack.name", "", "", function(form)
 			form:SetName("#godsenttools.pitchblack.name")
 
 			form:Help("#godsenttools.pitchblack.description")

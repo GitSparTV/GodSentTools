@@ -358,7 +358,7 @@ function TOOL:Deploy()
 	self.RefreshCache = true
 
 	if not VersionChecked then
-		http.Fetch("https://github.com/GitSparTV/GodSentTools/raw/master/godsenttools_locrotscale/lua/weapons/gmod_tool/stools/godsent_locrotscale.lua", function(b)
+		http.Fetch("https://github.com/GitSparTV/GodSentTools/raw/master/godsenttools_locrotscale/lua/weapons/gmod_tool/stools/godsenttools_locrotscale.lua", function(b)
 			local ver = b:match("^TOOL.LOCROTSCALEVERSION = \"(.-)\"\n")
 			VersionChecked = true
 

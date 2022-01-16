@@ -1,22 +1,22 @@
 do
 	local languageAdd = language.Add
-	languageAdd("tool.godsent_locrotscale.name", "LocRotScale")
-	languageAdd("tool.godsent_locrotscale.desc", "LocRotScale")
-	languageAdd("tool.godsent_locrotscale.propkeylabel", "Properties tab toggle hotkey")
-	languageAdd("tool.godsent_locrotscale.propkeytoggle", "Toggle properties menu")
-	languageAdd("tool.godsent_locrotscale.rotationpyrtoggle", "Show PYR rotation")
-	languageAdd("tool.godsent_locrotscale.prop.name", "Properties Tab Settings")
-	languageAdd("tool.godsent_locrotscale.selectionmenu.title", "LocRotScale Bone Selection")
-	languageAdd("tool.godsent_locrotscale.selectionmenu.id", "ID")
-	languageAdd("tool.godsent_locrotscale.selectionmenu.name", "Name")
-	languageAdd("tool.godsent_locrotscale.selectionmenu.distance", "Distance")
-	languageAdd("tool.godsent_locrotscale.selectionmenu.isvisible", "Is Visible")
-	languageAdd("tool.godsent_locrotscale.selectionmenu.parent", "Parent")
-	languageAdd("tool.godsent_locrotscale.selectionmenu.list", "List")
-	languageAdd("tool.godsent_locrotscale.selectionmenu.tree", "Hierarchy")
-	languageAdd("tool.godsent_locrotscale.selectionmenu.show", "Show")
-	languageAdd("tool.godsent_locrotscale.selectionmenu.use", "Select")
-	languageAdd("tool.godsent_locrotscale.selectionmenu.copy", "Copy name")
+	languageAdd("tool.godsenttools_locrotscale.name", "LocRotScale")
+	languageAdd("tool.godsenttools_locrotscale.desc", "LocRotScale")
+	languageAdd("tool.godsenttools_locrotscale.propkeylabel", "Properties tab toggle hotkey")
+	languageAdd("tool.godsenttools_locrotscale.propkeytoggle", "Toggle properties menu")
+	languageAdd("tool.godsenttools_locrotscale.rotationpyrtoggle", "Show PYR rotation")
+	languageAdd("tool.godsenttools_locrotscale.prop.name", "Properties Tab Settings")
+	languageAdd("tool.godsenttools_locrotscale.selectionmenu.title", "LocRotScale Bone Selection")
+	languageAdd("tool.godsenttools_locrotscale.selectionmenu.id", "ID")
+	languageAdd("tool.godsenttools_locrotscale.selectionmenu.name", "Name")
+	languageAdd("tool.godsenttools_locrotscale.selectionmenu.distance", "Distance")
+	languageAdd("tool.godsenttools_locrotscale.selectionmenu.isvisible", "Is Visible")
+	languageAdd("tool.godsenttools_locrotscale.selectionmenu.parent", "Parent")
+	languageAdd("tool.godsenttools_locrotscale.selectionmenu.list", "List")
+	languageAdd("tool.godsenttools_locrotscale.selectionmenu.tree", "Hierarchy")
+	languageAdd("tool.godsenttools_locrotscale.selectionmenu.show", "Show")
+	languageAdd("tool.godsenttools_locrotscale.selectionmenu.use", "Select")
+	languageAdd("tool.godsenttools_locrotscale.selectionmenu.copy", "Copy name")
 end
 
 local ceiloor = TOOL.ceiloor
@@ -77,16 +77,16 @@ do
 end
 
 function TOOL.BuildCPanel(form)
-	form:SetName("#tool.godsent_locrotscale.name")
+	form:SetName("#tool.godsenttools_locrotscale.name")
 	local general = vgui.Create("DForm")
-	general:SetName("#tool.godsent_locrotscale.general.name")
+	general:SetName("#tool.godsenttools_locrotscale.general.name")
 	form:AddItem(general)
-	general:CheckBox("#tool.godsent_locrotscale.propkeytoggle", "godsent_locrotscale_proptoggle")
+	general:CheckBox("#tool.godsenttools_locrotscale.propkeytoggle", "godsenttools_locrotscale_proptoggle")
 	local binder = vgui.Create("CtrlNumPad")
-	binder:SetConVar1("godsent_locrotscale_propkey")
-	binder:SetLabel1("#tool.godsent_locrotscale.propkeylabel")
+	binder:SetConVar1("godsenttools_locrotscale_propkey")
+	binder:SetLabel1("#tool.godsenttools_locrotscale.propkeylabel")
 	general:AddItem(binder)
-	general:CheckBox("#tool.godsent_locrotscale.rotationpyrtoggle", "godsent_locrotscale_rotationpyr")
+	general:CheckBox("#tool.godsenttools_locrotscale.rotationpyrtoggle", "godsenttools_locrotscale_rotationpyr")
 end
 
 function TOOL:Holster()
@@ -604,25 +604,25 @@ do
 			Frame = vgui.Create("DFrame")
 			Frame:SetSize(math.min(ScrW() * 0.9, 1280), math.min(ScrH() * 0.9, 720))
 			Frame:Center()
-			Frame:SetTitle("#tool.godsent_locrotscale.selectionmenu.title")
+			Frame:SetTitle("#tool.godsenttools_locrotscale.selectionmenu.title")
 			Frame:SetScreenLock(true)
 			Frame:SetSizable(true)
 			Frame:MakePopup()
 			local tabs = Frame:Add("DPropertySheet")
 			tabs:Dock(FILL)
 			local listp = tabs:Add("DPanel")
-			tabs:AddSheet("#tool.godsent_locrotscale.selectionmenu.list", listp, "icon16/text_list_numbers.png")
+			tabs:AddSheet("#tool.godsenttools_locrotscale.selectionmenu.list", listp, "icon16/text_list_numbers.png")
 			local listsearch = listp:Add("DTextEntry")
 			listsearch:Dock(TOP)
 			listsearch:DockMargin(0, 0, 0, 5)
 			local list = listp:Add("DListView")
 			list:Dock(FILL)
 			list:SetMultiSelect(false)
-			local col = list:AddColumn("#tool.godsent_locrotscale.selectionmenu.id")
-			local col1 = list:AddColumn("#tool.godsent_locrotscale.selectionmenu.name")
-			local col2 = list:AddColumn("#tool.godsent_locrotscale.selectionmenu.distance")
-			local col3 = list:AddColumn("#tool.godsent_locrotscale.selectionmenu.isvisible")
-			local col4 = list:AddColumn("#tool.godsent_locrotscale.selectionmenu.parent")
+			local col = list:AddColumn("#tool.godsenttools_locrotscale.selectionmenu.id")
+			local col1 = list:AddColumn("#tool.godsenttools_locrotscale.selectionmenu.name")
+			local col2 = list:AddColumn("#tool.godsenttools_locrotscale.selectionmenu.distance")
+			local col3 = list:AddColumn("#tool.godsenttools_locrotscale.selectionmenu.isvisible")
+			local col4 = list:AddColumn("#tool.godsenttools_locrotscale.selectionmenu.parent")
 			col:SetMaxWidth(30)
 			col1:SetWidth(200)
 			col2:SetMaxWidth(50)
@@ -709,17 +709,17 @@ do
 				function list:OnRowRightClick(lineID, line)
 					local menu = DermaMenu(line)
 
-					menu:AddOption("#tool.godsent_locrotscale.selectionmenu.show", function()
+					menu:AddOption("#tool.godsenttools_locrotscale.selectionmenu.show", function()
 						Frame:Hide()
 						tool:SelectionShowBone(E, line.BoneID)
 					end):SetIcon("icon16/find.png")
 
-					menu:AddOption("#tool.godsent_locrotscale.selectionmenu.use", function()
+					menu:AddOption("#tool.godsenttools_locrotscale.selectionmenu.use", function()
 						tool:SelectionSetBone(E, line.BoneID)
 						Frame:Close()
 					end):SetIcon("icon16/cursor.png")
 
-					menu:AddOption("#tool.godsent_locrotscale.selectionmenu.copy", function()
+					menu:AddOption("#tool.godsenttools_locrotscale.selectionmenu.copy", function()
 						SetClipboardText(BonesInfo[line.BoneID * 5])
 					end):SetIcon("icon16/paste_plain.png")
 
@@ -728,7 +728,7 @@ do
 			end
 
 			local tree = tabs:Add("DTree")
-			tabs:AddSheet("#tool.godsent_locrotscale.selectionmenu.tree", tree, "icon16/chart_organisation.png")
+			tabs:AddSheet("#tool.godsenttools_locrotscale.selectionmenu.tree", tree, "icon16/chart_organisation.png")
 
 			function tree:DoRightClick(node)
 				list:OnRowRightClick(nil, node)
@@ -1541,10 +1541,10 @@ do
 		local keystate = false
 		local position
 		local keylock = false
-		local HotKeyConvar = GetConVar("godsent_locrotscale_propkey")
-		local PYRConvar = GetConVar("godsent_locrotscale_rotationpyr")
+		local HotKeyConvar = GetConVar("godsenttools_locrotscale_propkey")
+		local PYRConvar = GetConVar("godsenttools_locrotscale_rotationpyr")
 
-		cvars.AddChangeCallback("godsent_locrotscale_proptoggle", function(_, _, val)
+		cvars.AddChangeCallback("godsenttools_locrotscale_proptoggle", function(_, _, val)
 			if val == "1" then
 				keylock = true
 				keystate = true
@@ -1560,10 +1560,10 @@ do
 		end)
 
 		hook.Add("PostReloadToolsMenu", "GodSentToolsLocRotScale", function()
-			HotKeyConvar = GetConVar("godsent_locrotscale_propkey")
-			PYRConvar = GetConVar("godsent_locrotscale_rotationpyr")
+			HotKeyConvar = GetConVar("godsenttools_locrotscale_propkey")
+			PYRConvar = GetConVar("godsenttools_locrotscale_rotationpyr")
 
-			if GetConVar("godsent_locrotscale_proptoggle"):GetBool() then
+			if GetConVar("godsenttools_locrotscale_proptoggle"):GetBool() then
 				keylock = true
 				keystate = true
 				animstate = true

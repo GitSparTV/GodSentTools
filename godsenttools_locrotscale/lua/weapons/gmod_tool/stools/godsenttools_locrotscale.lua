@@ -1,6 +1,6 @@
 TOOL.LOCROTSCALEVERSION = "0.1.3.1"
-TOOL.Category = "GodSent Tools"
-TOOL.Name = "#tool.godsent_locrotscale.name"
+TOOL.Category = "GodSentTools"
+TOOL.Name = "#tool.godsenttools_locrotscale.name"
 TOOL.ClientConVar["propkey"] = KEY_N
 TOOL.ClientConVar["proptoggle"] = 0
 TOOL.ClientConVar["rotationpyr"] = 1
@@ -559,8 +559,8 @@ do
 end
 
 if CLIENT then
-	include("godsent_locrotscale/cl_init.lua")
+	include("godsenttools_locrotscale/cl_init.lua")
 else
-	include("godsent_locrotscale/init.lua")
-	AddCSLuaFile("godsent_locrotscale/cl_init.lua")
+	include("godsenttools_locrotscale/init.lua")
+	AddCSLuaFile("godsenttools_locrotscale/cl_init.lua")
 end
