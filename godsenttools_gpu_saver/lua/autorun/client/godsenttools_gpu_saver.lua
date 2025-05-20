@@ -77,7 +77,7 @@ do
 	local ScrW, ScrH = ScrW, ScrH
 
 	local state = false
-	local darkMode = false
+	local darkMode = convarDarkMode:GetBool()
 
 	local t2D = {
 		type = "2D"
