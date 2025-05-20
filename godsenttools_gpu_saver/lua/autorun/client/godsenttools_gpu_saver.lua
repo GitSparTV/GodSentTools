@@ -94,10 +94,11 @@ do
 			end
 
 			local W, H = ScrW() * 0.5, ScrH() * 0.5
-			local red, green, blue = 0, 130, 255
+			local red, green, blue, textColor = 0, 130, 255, 255
 			if darkMode then
 				green = 0
 				blue = 0
+				textColor = 212
 			end
 
 			camStart(t2D)
@@ -106,7 +107,7 @@ do
 			surfaceDrawRect(0, 0, W * 2, H * 2)
 
 			surfaceSetFont("DermaLarge")
-			surfaceSetTextColor(255, 255, 255)
+			surfaceSetTextColor(textColor, textColor, textColor)
 
 			surfaceSetTextPos(W - Line1len, H - Line2h2)
 			surfaceDrawText("#godsenttools.gpusaver.screen.enabled")
