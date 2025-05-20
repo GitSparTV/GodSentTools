@@ -31,6 +31,9 @@ hook.Add("PopulateToolMenu", "GodSentToolsGPUSaver", function()
 		form:CheckBox("#godsenttools.enable", "godsenttools_gpu_saver")
 		form:ControlHelp("#godsenttools.gpusaver.enable.help")
 
+		form:CheckBox("#godsenttools.gpusaver.darkmode", "godsenttools_gpu_saver_darkmode")
+		form:ControlHelp("#godsenttools.gpusaver.darkmode.help")
+
 		form:Button("#godsenttools.gpusaver.enable.manual").DoClick = function()
 			if not convar:GetBool() then return end
 
