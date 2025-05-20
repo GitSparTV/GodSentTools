@@ -77,6 +77,7 @@ do
 	local ScrW, ScrH = ScrW, ScrH
 
 	local state = false
+	local darkMode = false
 
 	local t2D = {
 		type = "2D"
@@ -94,7 +95,7 @@ do
 
 			local W, H = ScrW() * 0.5, ScrH() * 0.5
 			local red, green, blue = 0, 130, 255
-			if convarDarkMode:GetBool() then
+			if darkMode then
 				green = 0
 				blue = 0
 			end
@@ -141,6 +142,13 @@ do
 			hook.Add("PreRender", "GodSentToolsGPUSaver", GPUSaver)
 		else
 			hook.Remove("PreRender", "GodSentToolsGPUSaver")
+		end
+	end, "GodSentToolsGPUSaver")
+	cvars.AddChangeCallback("godsenttools_gpu_saver_darkmode", function(_, _, newValue)
+		if newValue == "1" then
+			darkMode = true
+		else
+			darkMode = false
 		end
 	end, "GodSentToolsGPUSaver")
 end
