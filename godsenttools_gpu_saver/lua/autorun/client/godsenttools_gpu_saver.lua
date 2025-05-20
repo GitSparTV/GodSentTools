@@ -1,4 +1,5 @@
 local convar = CreateClientConVar("godsenttools_gpu_saver", "1", true, false, language.GetPhrase("#godsenttools.gpusaver.enable.help"), 0, 1)
+local convarDarkMode = CreateClientConVar("godsenttools_gpu_saver_darkmode", "0", true, false, language.GetPhrase("#godsenttools.gpusaver.darkmode.help"), 0, 1)
 local manual = false
 local KeyboardController = NULL
 
@@ -30,14 +31,24 @@ hook.Add("PopulateToolMenu", "GodSentToolsGPUSaver", function()
 		form:CheckBox("#godsenttools.enable", "godsenttools_gpu_saver")
 		form:ControlHelp("#godsenttools.gpusaver.enable.help")
 
+		form:CheckBox("#godsenttools.gpusaver.darkmode", "godsenttools_gpu_saver_darkmode")
+		form:ControlHelp("#godsenttools.gpusaver.darkmode.help")
+
 		form:Button("#godsenttools.gpusaver.enable.manual").DoClick = function()
 			if not convar:GetBool() then return end
+
+			local red, green, blue = 0, 130, 255
+			if convarDarkMode:GetBool() then
+				green = 0
+				blue = 0
+			end
+
 			local start = RealTime()
 
 			hook.Add("PostRenderVGUI", "GodSentToolsGPUSaver", function()
 				local anim = (RealTime() - start) * 1.5
 
-				surface.SetDrawColor(0, 130, 255, anim * 255)
+				surface.SetDrawColor(red, green, blue, anim * 255)
 				surface.DrawRect(0, 0, ScrW(), ScrH())
 
 				if anim > 1.2 then
@@ -69,6 +80,7 @@ do
 	local ScrW, ScrH = ScrW, ScrH
 
 	local state = false
+	local darkMode = convarDarkMode:GetBool()
 
 	local t2D = {
 		type = "2D"
@@ -85,14 +97,20 @@ do
 			end
 
 			local W, H = ScrW() * 0.5, ScrH() * 0.5
+			local red, green, blue, textColor = 0, 130, 255, 255
+			if darkMode then
+				green = 0
+				blue = 0
+				textColor = 212
+			end
 
 			camStart(t2D)
 
-			surfaceSetDrawColor(0, 130, 255)
+			surfaceSetDrawColor(red, green, blue)
 			surfaceDrawRect(0, 0, W * 2, H * 2)
 
 			surfaceSetFont("DermaLarge")
-			surfaceSetTextColor(255, 255, 255)
+			surfaceSetTextColor(textColor, textColor, textColor)
 
 			surfaceSetTextPos(W - Line1len, H - Line2h2)
 			surfaceDrawText("#godsenttools.gpusaver.screen.enabled")
@@ -128,6 +146,13 @@ do
 			hook.Add("PreRender", "GodSentToolsGPUSaver", GPUSaver)
 		else
 			hook.Remove("PreRender", "GodSentToolsGPUSaver")
+		end
+	end, "GodSentToolsGPUSaver")
+	cvars.AddChangeCallback("godsenttools_gpu_saver_darkmode", function(_, _, newValue)
+		if newValue == "1" then
+			darkMode = true
+		else
+			darkMode = false
 		end
 	end, "GodSentToolsGPUSaver")
 end
